@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
     // Choose a painter
     std::unique_ptr<gloperate::Painter> painter(nullptr);
 
-    std::string name = (argc > 1) ? argv[1] : "PostprocessingPipeline";
+    std::string name = (argc > 1) ? argv[1] : "MultiFramePainter";
 
     Plugin * plugin = pluginManager.plugin(name);
     if (!plugin)

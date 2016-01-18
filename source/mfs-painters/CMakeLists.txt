@@ -5,6 +5,7 @@
 
 find_package(GLM REQUIRED)
 find_package(cpplocate REQUIRED)
+find_package(glkernel REQUIRED)
 find_package(glbinding REQUIRED)
 find_package(globjects REQUIRED)
 find_package(libzeug REQUIRED)
@@ -120,6 +121,7 @@ target_link_libraries(${target}
     glbinding::glbinding
     globjects::globjects
     gloperate::gloperate
+    glkernel::glkernel
 
     PUBLIC
     ${DEFAULT_LIBRARIES}

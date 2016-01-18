@@ -24,6 +24,8 @@
 #include <gloperate/painter/ViewportCapability.h>
 #include <gloperate/painter/VirtualTimeCapability.h>
 
+#include <glkernel/Kernel.h>
+
 
 using namespace reflectionzeug;
 using namespace globjects;
@@ -71,6 +73,8 @@ MultiFramePainter::MultiFramePainter(ResourceManager & resourceManager, const cp
 , m_textureFilename("")
 , m_angle(0.0f)
 {
+    const auto moep = glkernel::kernel2{ };
+
     // Get data path
     std::string dataPath = moduleInfo.value("dataPath");
     dataPath = iozeug::FilePath(dataPath).path();

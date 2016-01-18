@@ -66,6 +66,8 @@ add_executable(${target}
 # Create namespaced alias
 add_executable(${META_PROJECT_NAME}::${target} ALIAS ${target})
 
+add_dependencies(${target} 
+    multiframesampling::mfs-painters)
 
 # 
 # Project options
