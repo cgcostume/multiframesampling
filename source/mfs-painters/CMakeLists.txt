@@ -1,7 +1,7 @@
 
-# 
+#
 # External dependencies
-# 
+#
 
 find_package(GLM REQUIRED)
 find_package(cpplocate REQUIRED)
@@ -12,9 +12,9 @@ find_package(libzeug REQUIRED)
 find_package(gloperate REQUIRED)
 
 
-# 
+#
 # Library name and options
-# 
+#
 
 # Target name
 set(target mfs-painters)
@@ -29,15 +29,20 @@ set(export_file  "include/${target}/${target}_api.h")
 set(export_macro "${target_upper}_API")
 
 
-# 
+#
 # Sources
-# 
+#
 
 set(include_path "${CMAKE_CURRENT_SOURCE_DIR}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(headers
     ${include_path}/multiframepainter/MultiFramePainter.h
+    ${include_path}/multiframepainter/MultiFramePipeline.h
+    ${include_path}/multiframepainter/ModelLoadingStage.h
+    ${include_path}/multiframepainter/RasterizationStage.h
+    ${include_path}/multiframepainter/PostProcessingStage.h
+
     ${include_path}/singleframepainter/SingleFramePainter.h
 )
 
@@ -45,21 +50,26 @@ set(sources
     ${source_path}/plugin.cpp
 
     ${source_path}/multiframepainter/MultiFramePainter.cpp
+    ${source_path}/multiframepainter/MultiFramePipeline.cpp
+    ${source_path}/multiframepainter/ModelLoadingStage.cpp
+    ${source_path}/multiframepainter/RasterizationStage.cpp
+    ${source_path}/multiframepainter/PostProcessingStage.cpp
+
     ${source_path}/singleframepainter/SingleFramePainter.cpp
 )
 
 # Group source files
 set(header_group "Header Files (API)")
 set(source_group "Source Files")
-source_group_by_path(${include_path} "\\\\.h$|\\\\.hpp$" 
+source_group_by_path(${include_path} "\\\\.h$|\\\\.hpp$"
     ${header_group} ${headers})
-source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$" 
+source_group_by_path(${source_path}  "\\\\.cpp$|\\\\.c$|\\\\.h$|\\\\.hpp$"
     ${source_group} ${sources})
 
 
-# 
+#
 # Create library
-# 
+#
 
 # Build library
 add_library(${target}
@@ -81,9 +91,9 @@ generate_export_header(${target}
 )
 
 
-# 
+#
 # Project options
-# 
+#
 
 set_target_properties(${target}
     PROPERTIES
@@ -92,9 +102,9 @@ set_target_properties(${target}
 )
 
 
-# 
+#
 # Include directories
-# 
+#
 
 target_include_directories(${target}
     PRIVATE
@@ -109,9 +119,9 @@ target_include_directories(${target}
 )
 
 
-# 
+#
 # Libraries
-# 
+#
 
 target_link_libraries(${target}
     PRIVATE
@@ -121,6 +131,7 @@ target_link_libraries(${target}
     glbinding::glbinding
     globjects::globjects
     gloperate::gloperate
+    gloperate::gloperate-assimp
     glkernel::glkernel
 
     PUBLIC
@@ -130,9 +141,9 @@ target_link_libraries(${target}
 )
 
 
-# 
+#
 # Compile definitions
-# 
+#
 
 target_compile_definitions(${target}
     PRIVATE
@@ -145,9 +156,9 @@ target_compile_definitions(${target}
 )
 
 
-# 
+#
 # Compile options
-# 
+#
 
 target_compile_options(${target}
     PRIVATE
@@ -159,9 +170,9 @@ target_compile_options(${target}
 )
 
 
-# 
+#
 # Linker options
-# 
+#
 
 target_link_libraries(${target}
     PRIVATE
@@ -173,9 +184,9 @@ target_link_libraries(${target}
 )
 
 
-# 
+#
 # Deployment
-# 
+#
 
 # Library
 install(TARGETS ${target}

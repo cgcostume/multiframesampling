@@ -1,19 +1,8 @@
-
 #pragma once
 
+#include <gloperate/pipeline/PipelinePainter.h>
 
-#include <reflectionzeug/base/FilePath.h>
-#include <reflectionzeug/base/Color.h>
-
-#include <globjects/base/ref_ptr.h>
-#include <globjects/VertexArray.h>
-#include <globjects/Buffer.h>
-#include <globjects/Program.h>
-#include <globjects/Shader.h>
-#include <globjects/Texture.h>
-
-#include <gloperate/painter/Painter.h>
-#include <gloperate/painter/Camera.h>
+#include "MultiFramePipeline.h"
 
 
 namespace gloperate 
@@ -21,56 +10,29 @@ namespace gloperate
     class ResourceManager;
     class AbstractTargetFramebufferCapability;
     class AbstractViewportCapability;
-    class AbstractVirtualTimeCapability;
+    class AbstractPerspectiveProjectionCapability;
+    class AbstractCameraCapability;
 }
 
 
-class MultiFramePainter : public gloperate::Painter
+class MultiFramePainter : public gloperate::PipelinePainter
 {
 public:
     MultiFramePainter(gloperate::ResourceManager & resourceManager, const cpplocate::ModuleInfo & moduleInfo);
     virtual ~MultiFramePainter();
 
-    bool animation() const;
-    void setAnimation(const bool & enabled);
 
-    reflectionzeug::Color background() const;
-    void setBackground(const reflectionzeug::Color & color);
-
-    reflectionzeug::FilePath texture() const;
-    void setTexture(const reflectionzeug::FilePath & filename);
+protected:
+    virtual void onInitialize() override;
+    virtual void onPaint() override;
 
 
 protected:
-    virtual void onInitialize();
-    virtual void onPaint();
-
-
-protected:
-    void createAndSetupCamera();
-    void createAndSetupTexture();
-    void createAndSetupGeometry();
-
-
-protected:
-    /* Parameters */
-    bool                     m_animation;
-    reflectionzeug::Color    m_background;
-    reflectionzeug::FilePath m_textureFilename;
+    MultiFramePipeline m_pipeline;
 
     /* Capabilities */
     gloperate::AbstractTargetFramebufferCapability * m_targetFramebufferCapability;
     gloperate::AbstractViewportCapability * m_viewportCapability;
-    gloperate::AbstractVirtualTimeCapability * m_timeCapability;
-
-    globjects::ref_ptr<gloperate::Camera>       m_camera;
-    globjects::ref_ptr<globjects::VertexArray>  m_vao;
-    globjects::ref_ptr<globjects::Buffer>       m_buffer;
-    globjects::ref_ptr<globjects::Program>      m_program;
-    globjects::ref_ptr<globjects::Shader>       m_vertexShader;
-    globjects::ref_ptr<globjects::Shader>       m_fragmentShader;
-    globjects::ref_ptr<globjects::Texture>      m_texture;
-
-    /* Data */
-    float m_angle;
+    gloperate::AbstractPerspectiveProjectionCapability * m_projectionCapability;
+    gloperate::AbstractCameraCapability * m_cameraCapability;
 };

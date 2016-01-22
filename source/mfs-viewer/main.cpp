@@ -41,6 +41,11 @@ int main(int argc, char * argv[])
     PluginManager pluginManager;
     pluginManager.addSearchPath(QCoreApplication::applicationDirPath().toStdString());
     pluginManager.addSearchPath(QCoreApplication::applicationDirPath().toStdString() + "/plugins");
+
+    #ifdef __APPLE__
+        pluginManager.addSearchPath(QCoreApplication::applicationDirPath().toStdString() + "/../../..");
+    #endif
+
     #ifdef NDEBUG
         pluginManager.scan("painters");
     #else
@@ -50,7 +55,11 @@ int main(int argc, char * argv[])
     // Choose a painter
     std::unique_ptr<gloperate::Painter> painter(nullptr);
 
-    std::string name = (argc > 1) ? argv[1] : "MultiFramePainter";
+    #ifdef __APPLE__
+        std::string name = "MultiFramePainter";
+    #else
+        std::string name = (argc > 1) ? argv[1] : "MultiFramePainter";
+    #endif
 
     Plugin * plugin = pluginManager.plugin(name);
     if (!plugin)
