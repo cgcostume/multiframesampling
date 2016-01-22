@@ -16,9 +16,10 @@
 #include <gloperate/plugin/PainterPlugin.h>
 #include <gloperate/resources/ResourceManager.h>
 
+#include <gloperate-assimp/AssimpSceneLoader.h>
+
 #include <gloperate-qt/viewer/QtOpenGLWindow.h>
 #include <gloperate-qt/viewer/QtTextureLoader.h>
-#include <gloperate-qt/viewer/QtTextureStorer.h>
 #include <gloperate-qt/viewer/QtKeyEventProvider.h>
 #include <gloperate-qt/viewer/QtMouseEventProvider.h>
 #include <gloperate-qt/viewer/QtWheelEventProvider.h>
@@ -27,6 +28,7 @@
 
 
 using namespace gloperate;
+using namespace gloperate_assimp;
 using namespace gloperate_qt;
 
 
@@ -36,7 +38,7 @@ int main(int argc, char * argv[])
 
     ResourceManager resourceManager;
     resourceManager.addLoader(new QtTextureLoader());
-    resourceManager.addStorer(new QtTextureStorer());
+    resourceManager.addLoader(new AssimpSceneLoader());
 
     PluginManager pluginManager;
     pluginManager.addSearchPath(QCoreApplication::applicationDirPath().toStdString());

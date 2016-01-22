@@ -20,6 +20,9 @@ void RasterizationStage::initialize()
 {
     setupGLState();
 
+    camera.data()->setEye({ 1.0575, 0.7301, -1.59997 });
+    camera.data()->setCenter({ -0.618056, -0.782045, 1.98035 });
+
     m_program = new globjects::Program();
     m_program->attach(
         globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/standard.vert"),
@@ -42,6 +45,10 @@ void RasterizationStage::render()
     //targetFBO.data()->framebuffer()->bind();
     m_program->use();
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_program->setUniform("mvp", projection.data()->projection() * camera.data()->view());
+
     model.data()->draw();
 
     m_program->release();
@@ -50,5 +57,6 @@ void RasterizationStage::render()
 
 void RasterizationStage::setupGLState()
 {
-    
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
 }

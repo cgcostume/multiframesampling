@@ -110,6 +110,7 @@ target_link_libraries(${target}
     globjects::globjects
     gloperate::gloperate
     gloperate::gloperate-qt
+    gloperate::gloperate-assimp
 )
 
 
