@@ -2,6 +2,8 @@
 
 #include <glbinding/gl/gl.h>
 
+#include <glm/gtc/random.hpp>
+
 #include <globjects/Framebuffer.h>
 #include <globjects/Texture.h>
 #include <globjects/Program.h>
@@ -107,6 +109,15 @@ void RasterizationStage::render()
     m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0.0f);
 
     m_program->use();
+
+    // TODO: use glkernel
+    auto subpixelSample = glm::vec2(
+        glm::linearRand(-0.5f, 0.5f),
+        glm::linearRand(-0.5f, 0.5f)
+    );
+    auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
+
+    m_program->setUniform("ndcOffset", subpixelSample / viewportSize);
     m_program->setUniform("mvp", projection.data()->projection() * camera.data()->view());
 
     for (auto& drawable : drawables.data())
