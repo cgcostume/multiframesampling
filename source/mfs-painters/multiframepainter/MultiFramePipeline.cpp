@@ -1,4 +1,4 @@
-#include "MultiframePipeline.h"
+#include "MultiFramePipeline.h"
 
 #include "ModelLoadingStage.h"
 #include "RasterizationStage.h"
