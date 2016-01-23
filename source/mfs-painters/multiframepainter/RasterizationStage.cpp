@@ -10,7 +10,6 @@
 #include <gloperate/painter/AbstractPerspectiveProjectionCapability.h>
 #include <gloperate/painter/AbstractViewportCapability.h>
 #include <gloperate/painter/AbstractCameraCapability.h>
-#include <gloperate/painter/AbstractTargetFramebufferCapability.h>
 
 #include <gloperate/primitives/PolygonalDrawable.h>
 
@@ -19,6 +18,8 @@ using namespace gl;
 
 RasterizationStage::RasterizationStage()
 {
+    currentFrame.data() = 0;
+
     addInput("projection", projection);
     addInput("viewport", viewport);
     addInput("camera", camera); 
@@ -32,8 +33,6 @@ RasterizationStage::RasterizationStage()
 void RasterizationStage::initialize()
 {
     setupGLState();
-
-    alwaysProcess(true);
 
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
@@ -59,6 +58,22 @@ void RasterizationStage::process()
     if (viewport.hasChanged())
     {
         resizeTextures(viewport.data()->width(), viewport.data()->height());
+    }
+
+    currentFrame.data() += 1;
+    for (auto input : this->inputs())
+    {
+        if (input->hasChanged())
+        {
+            currentFrame.data() = 0;
+            alwaysProcess(true);
+        }
+    }
+
+    if (currentFrame.data() >= multiFrameCount.data())
+    {
+        alwaysProcess(false);
+        return;
     }
 
     render();

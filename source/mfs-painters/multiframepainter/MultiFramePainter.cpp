@@ -5,18 +5,14 @@
 
 #include <cpplocate/ModuleInfo.h>
 
-#include <glm/gtc/constants.hpp>
-
 #include <iozeug/FilePath.h>
 
 #include <gloperate/resources/ResourceManager.h>
 #include <gloperate/base/registernamedstrings.h>
 #include <gloperate/painter/ViewportCapability.h>
-#include <gloperate/painter/VirtualTimeCapability.h>
 #include <gloperate/painter/TargetFramebufferCapability.h>
 #include <gloperate/painter/PerspectiveProjectionCapability.h>
 #include <gloperate/painter/CameraCapability.h>
-#include <gloperate/painter/VirtualTimeCapability.h>
 
 
 using namespace reflectionzeug;
@@ -50,6 +46,10 @@ MultiFramePainter::MultiFramePainter(ResourceManager & resourceManager, const cp
     m_pipeline.viewport.setData(m_viewportCapability);
     m_pipeline.projection.setData(m_projectionCapability);
     m_pipeline.camera.setData(m_cameraCapability);
+
+    m_cameraCapability->changed.connect([this](){ m_pipeline.camera.invalidate(); });
+    m_viewportCapability->changed.connect([this]() { m_pipeline.viewport.invalidate(); });
+    m_projectionCapability->changed.connect([this]() { m_pipeline.projection.invalidate(); });
 }
 
 MultiFramePainter::~MultiFramePainter()

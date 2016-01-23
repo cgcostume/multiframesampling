@@ -5,11 +5,9 @@
 
 namespace gloperate
 {
-    class AbstractTargetFramebufferCapability;
     class AbstractPerspectiveProjectionCapability;
     class AbstractCameraCapability;
     class AbstractViewportCapability;
-    class AbstractVirtualTimeCapability;
 }
 
 class MultiFramePipeline : public gloperate::AbstractPipeline
@@ -19,6 +17,7 @@ public:
 
     gloperate::Data<gloperate::ResourceManager *> resourceManager;
     gloperate::Data<std::string> modelFilename;
+    gloperate::Data<int> multiFrameCount;
 
     gloperate::Data<gloperate::AbstractViewportCapability *> viewport;
     gloperate::Data<gloperate::AbstractCameraCapability *> camera;

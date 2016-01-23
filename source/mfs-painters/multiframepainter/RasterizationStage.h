@@ -20,7 +20,6 @@ namespace gloperate
     class AbstractPerspectiveProjectionCapability;
     class AbstractViewportCapability;
     class AbstractCameraCapability;
-    class AbstractTargetFramebufferCapability;
 
     class PolygonalDrawable;
 }
@@ -38,7 +37,9 @@ public:
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
     gloperate::InputSlot<PolygonalDrawables> drawables;
+    gloperate::InputSlot<int> multiFrameCount;
 
+    gloperate::Data<int> currentFrame;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> normal;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> depth;
