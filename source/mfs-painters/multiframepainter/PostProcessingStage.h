@@ -15,6 +15,7 @@ namespace globjects
 namespace gloperate
 {
     class AbstractViewportCapability;
+    class ScreenAlignedQuad;
 }
 
 class PostProcessingStage : public gloperate::AbstractStage
@@ -25,6 +26,7 @@ public:
     virtual void initialize() override;
 
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
+    gloperate::InputSlot<int> currentFrame;
 
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> depth;
@@ -34,5 +36,9 @@ public:
 protected:
     virtual void process() override;
 
+    void resizeTexture(int width, int height);
+
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
+    globjects::ref_ptr<globjects::Texture> m_accumulation;
+    globjects::ref_ptr<gloperate::ScreenAlignedQuad> m_screenAlignedQuad;
 };

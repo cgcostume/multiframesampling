@@ -9,7 +9,7 @@ MultiFramePipeline::MultiFramePipeline()
 : gloperate::AbstractPipeline("MultiframeSampling")
 , resourceManager(nullptr)
 , modelFilename("data/transparency_scene.obj")
-, multiFrameCount(10)
+, multiFrameCount(64)
 {
     auto modelLoadingStage = new ModelLoadingStage();
     auto rasterizationStage = new RasterizationStage();
@@ -25,6 +25,7 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->drawables = modelLoadingStage->drawables;
 
     postProcessingStage->viewport = viewport;
+    postProcessingStage->currentFrame = rasterizationStage->currentFrame;
     postProcessingStage->color = rasterizationStage->color;
     postProcessingStage->normal = rasterizationStage->normal;
     postProcessingStage->depth = rasterizationStage->depth;

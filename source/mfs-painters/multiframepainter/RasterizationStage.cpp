@@ -20,7 +20,7 @@ using namespace gl;
 
 RasterizationStage::RasterizationStage()
 {
-    currentFrame.data() = 0;
+    currentFrame.data() = 1;
 
     addInput("projection", projection);
     addInput("viewport", viewport);
@@ -67,12 +67,12 @@ void RasterizationStage::process()
     {
         if (input->hasChanged())
         {
-            currentFrame.data() = 0;
+            currentFrame.data() = 1;
             alwaysProcess(true);
         }
     }
 
-    if (currentFrame.data() >= multiFrameCount.data())
+    if (currentFrame.data() > multiFrameCount.data())
     {
         alwaysProcess(false);
         return;
@@ -111,9 +111,10 @@ void RasterizationStage::render()
     m_program->use();
 
     // TODO: use glkernel
+    auto range = 0.5f;
     auto subpixelSample = glm::vec2(
-        glm::linearRand(-0.5f, 0.5f),
-        glm::linearRand(-0.5f, 0.5f)
+        glm::linearRand(-range, range),
+        glm::linearRand(-range, range)
     );
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
 
