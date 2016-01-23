@@ -17,10 +17,14 @@ namespace gloperate
 class ModelLoadingStage : public gloperate::AbstractStage
 {
 public:
+    ModelLoadingStage();
+
+    using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
+
     gloperate::InputSlot<gloperate::ResourceManager*> resourceManager;
     gloperate::InputSlot<std::string> modelFilename;
 
-    gloperate::Data<gloperate::PolygonalDrawable *> model;
+    gloperate::Data<PolygonalDrawables> drawables;
 
 protected:
     virtual void process() override;

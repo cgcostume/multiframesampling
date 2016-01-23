@@ -4,11 +4,23 @@
 #include <gloperate/primitives/Scene.h>
 #include <gloperate/resources/ResourceManager.h>
 
+ModelLoadingStage::ModelLoadingStage()
+{
+    addInput("resouceManager", resourceManager);
+    addInput("modelFilename", modelFilename);
+
+    addOutput("drawables", drawables);
+}
+
 void ModelLoadingStage::process()
 {
-    auto x = resourceManager.data()->load<gloperate::Scene>(modelFilename.data());
+    drawables.data() = PolygonalDrawables{};
+    auto scene = resourceManager.data()->load<gloperate::Scene>(modelFilename.data());
 
-    model = new gloperate::PolygonalDrawable(*x->meshes().front());
+    for (auto mesh : scene->meshes())
+    {
+        drawables->push_back(std::make_unique<gloperate::PolygonalDrawable>(*mesh));
+    }
 
     invalidateOutputs();
 }

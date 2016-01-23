@@ -16,9 +16,20 @@
 using namespace gl;
 
 
+RasterizationStage::RasterizationStage()
+{
+    addInput("projection", projection);
+    addInput("viewport", viewport);
+    addInput("camera", camera); 
+    addInput("targetFBO", targetFBO);
+    addInput("drawables", drawables);
+}
+
 void RasterizationStage::initialize()
 {
     setupGLState();
+
+    alwaysProcess(true);
 
     camera.data()->setEye({ 1.0575, 0.7301, -1.59997 });
     camera.data()->setCenter({ -0.618056, -0.782045, 1.98035 });
@@ -49,7 +60,10 @@ void RasterizationStage::render()
 
     m_program->setUniform("mvp", projection.data()->projection() * camera.data()->view());
 
-    model.data()->draw();
+    for (auto& drawable : drawables.data())
+    {
+        drawable->draw();
+    }
 
     m_program->release();
     //globjects::Framebuffer::unbind();
@@ -58,5 +72,6 @@ void RasterizationStage::render()
 void RasterizationStage::setupGLState()
 {
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 }

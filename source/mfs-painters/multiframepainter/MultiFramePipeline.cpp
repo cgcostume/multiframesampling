@@ -21,9 +21,7 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->camera = camera;
     rasterizationStage->viewport = viewport;
     rasterizationStage->targetFBO = targetFBO;
-    rasterizationStage->model = modelLoadingStage->model;
+    rasterizationStage->drawables = modelLoadingStage->drawables;
 
     addStages(modelLoadingStage, rasterizationStage);//, postProcessingStage);
 }
-
-

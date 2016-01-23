@@ -24,14 +24,18 @@ namespace gloperate
 class RasterizationStage : public gloperate::AbstractStage
 {
 public:
+    RasterizationStage();
+
     virtual void initialize() override;
+
+    using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
 
     gloperate::InputSlot<gloperate::AbstractPerspectiveProjectionCapability *> projection;
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
     gloperate::InputSlot<gloperate::AbstractTargetFramebufferCapability *> targetFBO;
 
-    gloperate::InputSlot<gloperate::PolygonalDrawable *> model;
+    gloperate::InputSlot<PolygonalDrawables> drawables;
 
 protected:
     virtual void process() override;
