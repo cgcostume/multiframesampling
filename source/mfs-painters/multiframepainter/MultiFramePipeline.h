@@ -23,5 +23,4 @@ public:
     gloperate::Data<gloperate::AbstractViewportCapability *> viewport;
     gloperate::Data<gloperate::AbstractCameraCapability *> camera;
     gloperate::Data<gloperate::AbstractPerspectiveProjectionCapability *> projection;
-    gloperate::Data<gloperate::AbstractTargetFramebufferCapability *> targetFBO;
 };

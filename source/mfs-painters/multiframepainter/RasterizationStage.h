@@ -11,6 +11,8 @@
 namespace globjects
 {
     class Program;
+    class Texture;
+    class Framebuffer;
 }
 
 namespace gloperate
@@ -35,15 +37,20 @@ public:
     gloperate::InputSlot<gloperate::AbstractPerspectiveProjectionCapability *> projection;
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
-    gloperate::InputSlot<gloperate::AbstractTargetFramebufferCapability *> targetFBO;
-
     gloperate::InputSlot<PolygonalDrawables> drawables;
+
+    gloperate::Data<globjects::ref_ptr<globjects::Texture>> color;
+    gloperate::Data<globjects::ref_ptr<globjects::Texture>> normal;
+    gloperate::Data<globjects::ref_ptr<globjects::Texture>> depth;
+
 
 protected:
     virtual void process() override;
 
+    void resizeTextures(int width, int height);
     void setupGLState();
     void render();
 
+    globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<globjects::Program> m_program;
 };

@@ -12,7 +12,7 @@ MultiFramePipeline::MultiFramePipeline()
 {
     auto modelLoadingStage = new ModelLoadingStage();
     auto rasterizationStage = new RasterizationStage();
-    //auto postProcessingStage = new PostProcessingStage();
+    auto postProcessingStage = new PostProcessingStage();
 
     modelLoadingStage->resourceManager = resourceManager;
     modelLoadingStage->modelFilename = modelFilename;
@@ -20,8 +20,12 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->projection = projection;
     rasterizationStage->camera = camera;
     rasterizationStage->viewport = viewport;
-    rasterizationStage->targetFBO = targetFBO;
     rasterizationStage->drawables = modelLoadingStage->drawables;
 
-    addStages(modelLoadingStage, rasterizationStage);//, postProcessingStage);
+    postProcessingStage->viewport = viewport;
+    postProcessingStage->color = rasterizationStage->color;
+    postProcessingStage->normal = rasterizationStage->normal;
+    postProcessingStage->depth = rasterizationStage->depth;
+
+    addStages(modelLoadingStage, rasterizationStage, postProcessingStage);
 }

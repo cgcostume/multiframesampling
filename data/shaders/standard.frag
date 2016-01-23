@@ -2,9 +2,11 @@
 
 in vec3 v_normal;
 
-out vec4 outColor;
+layout(location = 0) out vec3 outColor;
+layout(location = 1) out vec3 outNormal;
 
 void main()
 {
-    outColor = vec4(v_normal, 1.0);
+    outColor = v_normal;
+    outNormal = v_normal;
 }
