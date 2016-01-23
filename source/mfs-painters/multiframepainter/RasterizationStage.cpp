@@ -35,9 +35,9 @@ void RasterizationStage::initialize()
 
     alwaysProcess(true);
 
-    color.data() = new globjects::Texture();
-    normal.data() = new globjects::Texture();
-    depth.data() = new globjects::Texture();
+    color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
+    normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
+    depth.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
 
     m_fbo = new globjects::Framebuffer();
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, color.data());
