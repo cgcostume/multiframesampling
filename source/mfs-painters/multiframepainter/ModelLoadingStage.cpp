@@ -3,6 +3,9 @@
 #include <gloperate/primitives/PolygonalDrawable.h>
 #include <gloperate/primitives/Scene.h>
 #include <gloperate/resources/ResourceManager.h>
+#include <gloperate/base/make_unique.hpp>
+
+using gloperate::make_unique;
 
 ModelLoadingStage::ModelLoadingStage()
 {
@@ -19,7 +22,7 @@ void ModelLoadingStage::process()
 
     for (auto mesh : scene->meshes())
     {
-        drawables->push_back(std::make_unique<gloperate::PolygonalDrawable>(*mesh));
+        drawables->push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
     }
 
     invalidateOutputs();

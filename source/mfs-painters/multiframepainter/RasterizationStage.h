@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <globjects/base/ref_ptr.h>
 
 #include <gloperate/pipeline/AbstractStage.h>
