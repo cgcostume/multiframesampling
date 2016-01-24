@@ -21,10 +21,10 @@ FrameAccumulationStage::FrameAccumulationStage()
 
 void FrameAccumulationStage::initialize()
 {
-    m_accumulation = globjects::Texture::createDefault(GL_TEXTURE_2D);
-    
+    accumulation = globjects::Texture::createDefault(GL_TEXTURE_2D);
+
     m_fbo = new globjects::Framebuffer();
-    m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, m_accumulation);
+    m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, accumulation.data());
     m_fbo->attachTexture(GL_DEPTH_ATTACHMENT, depth.data());
 
     m_screenAlignedQuad = new gloperate::ScreenAlignedQuad(
@@ -43,32 +43,24 @@ void FrameAccumulationStage::process()
     m_fbo->bind();
     m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-    m_accumulation->bindActive(0);
+    accumulation.data()->bindActive(0);
     frame.data()->bindActive(1);
     m_screenAlignedQuad->program()->setUniform("accumBuffer", 0);
     m_screenAlignedQuad->program()->setUniform("frameBuffer", 1);
     m_screenAlignedQuad->program()->setUniform("weight", 1.0f / currentFrame.data());
 
     m_screenAlignedQuad->draw();
-    m_accumulation->unbindActive(0);
+    accumulation.data()->unbindActive(0);
     frame.data()->unbindActive(1);
 
     m_fbo->unbind();
     glDepthMask(GL_TRUE);
 
-    auto rect = std::array<GLint, 4> {
-        viewport.data()->x(),
-        viewport.data()->y(),
-        viewport.data()->width(),
-        viewport.data()->height()
-    };
-
-    auto defaultFbo = globjects::Framebuffer::defaultFBO();
-    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, defaultFbo, GL_FRONT_LEFT, rect, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    invalidateOutputs();
 }
 
 void FrameAccumulationStage::resizeTexture(int width, int height)
 {
-    m_accumulation->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    accumulation.data()->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
     m_fbo->printStatus(true);
 }

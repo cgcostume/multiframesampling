@@ -4,6 +4,7 @@
 #include "RasterizationStage.h"
 #include "PostprocessingStage.h"
 #include "FrameAccumulationStage.h"
+#include "BlitStage.h"
 
 
 MultiFramePipeline::MultiFramePipeline()
@@ -16,6 +17,7 @@ MultiFramePipeline::MultiFramePipeline()
     auto rasterizationStage = new RasterizationStage();
     auto postprocessingStage = new PostprocessingStage();
     auto frameAccumulationStage = new FrameAccumulationStage();
+    auto blitStage = new BlitStage();
 
     modelLoadingStage->resourceManager = resourceManager;
     modelLoadingStage->modelFilename = modelFilename;
@@ -38,5 +40,9 @@ MultiFramePipeline::MultiFramePipeline()
     frameAccumulationStage->frame = postprocessingStage->postprocessedFrame;
     frameAccumulationStage->depth = rasterizationStage->depth;
 
-    addStages(modelLoadingStage, rasterizationStage, postprocessingStage, frameAccumulationStage);
+    blitStage->viewport = viewport;
+    blitStage->accumulation = frameAccumulationStage->accumulation;
+    blitStage->depth = rasterizationStage->depth;
+
+    addStages(modelLoadingStage, rasterizationStage, postprocessingStage, frameAccumulationStage, blitStage);
 }
