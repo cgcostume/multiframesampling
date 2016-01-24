@@ -58,6 +58,8 @@ void PostProcessingStage::process()
     m_screenAlignedQuad->program()->setUniform("weight", 1.0f / currentFrame.data());
 
     m_screenAlignedQuad->draw();
+    m_accumulation->unbindActive(0);
+    color.data()->unbindActive(1);
 
     m_fbo->unbind();
     glDepthMask(GL_TRUE);
