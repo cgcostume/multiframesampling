@@ -2,6 +2,7 @@
 
 #include "ModelLoadingStage.h"
 #include "RasterizationStage.h"
+#include "PostprocessingStage.h"
 #include "FrameAccumulationStage.h"
 
 
@@ -13,6 +14,7 @@ MultiFramePipeline::MultiFramePipeline()
 {
     auto modelLoadingStage = new ModelLoadingStage();
     auto rasterizationStage = new RasterizationStage();
+    auto postprocessingStage = new PostprocessingStage();
     auto frameAccumulationStage = new FrameAccumulationStage();
 
     modelLoadingStage->resourceManager = resourceManager;
@@ -24,10 +26,17 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->multiFrameCount = multiFrameCount;
     rasterizationStage->drawables = modelLoadingStage->drawables;
 
+    postprocessingStage->viewport = viewport;
+    postprocessingStage->camera = camera;
+    postprocessingStage->projection = projection;
+    postprocessingStage->color = rasterizationStage->color;
+    postprocessingStage->normal = rasterizationStage->normal;
+    postprocessingStage->depth = rasterizationStage->depth;
+
     frameAccumulationStage->viewport = viewport;
     frameAccumulationStage->currentFrame = rasterizationStage->currentFrame;
-    frameAccumulationStage->frame = rasterizationStage->color;
+    frameAccumulationStage->frame = postprocessingStage->postprocessedFrame;
     frameAccumulationStage->depth = rasterizationStage->depth;
 
-    addStages(modelLoadingStage, rasterizationStage, frameAccumulationStage);
+    addStages(modelLoadingStage, rasterizationStage, postprocessingStage, frameAccumulationStage);
 }
