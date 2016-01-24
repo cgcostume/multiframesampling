@@ -2,8 +2,6 @@
 
 #include <glbinding/gl/gl.h>
 
-#include <glm/vec4.hpp>
-
 #include <globjects/Texture.h>
 #include <globjects/Program.h>
 #include <globjects/Framebuffer.h>
@@ -39,11 +37,6 @@ void FrameAccumulationStage::process()
     if (viewport.hasChanged())
     {
         resizeTexture(viewport.data()->width(), viewport.data()->height());
-    }
-
-    if (currentFrame.data() == 1)
-    {
-        m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(0.0f));
     }
 
     glDepthMask(GL_FALSE);
