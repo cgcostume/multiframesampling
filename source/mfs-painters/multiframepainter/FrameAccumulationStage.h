@@ -18,10 +18,10 @@ namespace gloperate
     class ScreenAlignedQuad;
 }
 
-class PostProcessingStage : public gloperate::AbstractStage
+class FrameAccumulationStage : public gloperate::AbstractStage
 {
 public:
-    PostProcessingStage();
+    FrameAccumulationStage();
 
     virtual void initialize() override;
 

@@ -1,4 +1,4 @@
-#include "PostProcessingStage.h"
+#include "FrameAccumulationStage.h"
 
 #include <glbinding/gl/gl.h>
 
@@ -13,7 +13,7 @@
 
 using namespace gl;
 
-PostProcessingStage::PostProcessingStage()
+FrameAccumulationStage::FrameAccumulationStage()
 {
     addInput("viewport", viewport);
     addInput("color", color);
@@ -22,7 +22,7 @@ PostProcessingStage::PostProcessingStage()
     addInput("currentFrame", currentFrame);
 }
 
-void PostProcessingStage::initialize()
+void FrameAccumulationStage::initialize()
 {
     m_accumulation = globjects::Texture::createDefault(GL_TEXTURE_2D);
     
@@ -35,7 +35,7 @@ void PostProcessingStage::initialize()
     );
 }
 
-void PostProcessingStage::process()
+void FrameAccumulationStage::process()
 {
     if (viewport.hasChanged())
     {
@@ -75,7 +75,7 @@ void PostProcessingStage::process()
     m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, defaultFbo, GL_FRONT_LEFT, rect, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
 
-void PostProcessingStage::resizeTexture(int width, int height)
+void FrameAccumulationStage::resizeTexture(int width, int height)
 {
     m_accumulation->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
     m_fbo->printStatus(true);
