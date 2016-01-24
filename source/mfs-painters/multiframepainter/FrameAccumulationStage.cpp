@@ -16,9 +16,8 @@ using namespace gl;
 FrameAccumulationStage::FrameAccumulationStage()
 {
     addInput("viewport", viewport);
-    addInput("color", color);
+    addInput("frame", frame);
     addInput("depth", depth);
-    addInput("normal", normal);
     addInput("currentFrame", currentFrame);
 }
 
@@ -52,14 +51,14 @@ void FrameAccumulationStage::process()
     m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
 
     m_accumulation->bindActive(0);
-    color.data()->bindActive(1);
+    frame.data()->bindActive(1);
     m_screenAlignedQuad->program()->setUniform("accumBuffer", 0);
     m_screenAlignedQuad->program()->setUniform("frameBuffer", 1);
     m_screenAlignedQuad->program()->setUniform("weight", 1.0f / currentFrame.data());
 
     m_screenAlignedQuad->draw();
     m_accumulation->unbindActive(0);
-    color.data()->unbindActive(1);
+    frame.data()->unbindActive(1);
 
     m_fbo->unbind();
     glDepthMask(GL_TRUE);

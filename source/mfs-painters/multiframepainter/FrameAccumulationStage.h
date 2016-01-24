@@ -28,9 +28,8 @@ public:
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<int> currentFrame;
 
-    gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
+    gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> frame;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> depth;
-    gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> normal;
 
 
 protected:

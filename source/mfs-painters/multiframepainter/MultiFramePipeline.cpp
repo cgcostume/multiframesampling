@@ -26,7 +26,7 @@ MultiFramePipeline::MultiFramePipeline()
 
     frameAccumulationStage->viewport = viewport;
     frameAccumulationStage->currentFrame = rasterizationStage->currentFrame;
-    frameAccumulationStage->color = rasterizationStage->color;
+    frameAccumulationStage->frame = rasterizationStage->color;
     frameAccumulationStage->depth = rasterizationStage->depth;
 
     addStages(modelLoadingStage, rasterizationStage, frameAccumulationStage);
