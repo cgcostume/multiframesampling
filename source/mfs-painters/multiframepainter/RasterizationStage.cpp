@@ -118,7 +118,8 @@ void RasterizationStage::render()
     );
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
 
-    m_program->setUniform("ndcOffset", subpixelSample / viewportSize);
+    // offset needs to be doubled, because ndc range is [-1;1] and not [0;1]
+    m_program->setUniform("ndcOffset", 2.0f * subpixelSample / viewportSize);
     m_program->setUniform("mvp", projection.data()->projection() * camera.data()->view());
 
     for (auto& drawable : drawables.data())
