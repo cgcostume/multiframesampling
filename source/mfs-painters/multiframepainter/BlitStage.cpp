@@ -36,5 +36,5 @@ void BlitStage::process()
     };
 
     auto defaultFbo = globjects::Framebuffer::defaultFBO();
-    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, defaultFbo, GL_FRONT_LEFT, rect, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    m_fbo->blit(GL_COLOR_ATTACHMENT0, rect, defaultFbo, GL_BACK_LEFT, rect, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 }
