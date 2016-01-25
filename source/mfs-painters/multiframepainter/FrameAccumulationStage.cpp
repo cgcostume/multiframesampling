@@ -1,6 +1,8 @@
 #include "FrameAccumulationStage.h"
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl/enum.h>
+#include <glbinding/gl/functions.h>
+#include <glbinding/gl/boolean.h>
 
 #include <globjects/Texture.h>
 #include <globjects/Program.h>

@@ -1,8 +1,7 @@
 #include "BlitStage.h"
 
-#include <glbinding/gl/gl.h>
-
-#include <glm/vec4.hpp>
+#include <glbinding/gl/enum.h>
+#include <glbinding/gl/bitfield.h>
 
 #include <globjects/Texture.h>
 #include <globjects/Framebuffer.h>

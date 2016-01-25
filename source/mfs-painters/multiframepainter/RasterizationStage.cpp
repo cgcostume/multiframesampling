@@ -1,6 +1,8 @@
 #include "RasterizationStage.h"
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl/enum.h>
+#include <glbinding/gl/functions.h>
+#include <glbinding/gl/boolean.h>
 
 #include <glm/gtc/random.hpp>
 

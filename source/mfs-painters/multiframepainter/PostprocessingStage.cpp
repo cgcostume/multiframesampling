@@ -1,6 +1,6 @@
 #include "PostprocessingStage.h"
 
-#include <glbinding/gl/gl.h>
+#include <glbinding/gl/enum.h>
 
 #include <glm/vec3.hpp>
 #include <glm/gtc/random.hpp>
