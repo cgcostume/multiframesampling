@@ -10,7 +10,7 @@ uniform vec2 ndcOffset;
 
 void main()
 {
-    vec4 ndcVertex =  mvp * vec4(a_vertex, 1.0);
+    vec4 ndcVertex = mvp * vec4(a_vertex, 1.0);
     ndcVertex.xy += ndcOffset * ndcVertex.w;
 
     v_normal = a_normal;

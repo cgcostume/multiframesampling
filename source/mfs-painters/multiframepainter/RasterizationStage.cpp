@@ -50,8 +50,8 @@ void RasterizationStage::initialize()
 
     m_program = new globjects::Program();
     m_program->attach(
-        globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/standard.vert"),
-        globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/standard.frag")
+        globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/model.vert"),
+        globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/model.frag")
     );
 }
 
