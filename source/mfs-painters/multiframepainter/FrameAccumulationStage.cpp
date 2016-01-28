@@ -63,6 +63,6 @@ void FrameAccumulationStage::process()
 
 void FrameAccumulationStage::resizeTexture(int width, int height)
 {
-    accumulation.data()->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    accumulation.data()->image2D(0, GL_RGBA32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
     m_fbo->printStatus(true);
 }

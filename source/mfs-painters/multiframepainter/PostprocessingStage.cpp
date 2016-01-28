@@ -17,7 +17,7 @@
 using namespace gl;
 
 
-namespace 
+namespace
 {
     std::vector<glm::vec3> ssaoKernel(unsigned int size)
     {
@@ -112,7 +112,7 @@ PostprocessingStage::PostprocessingStage()
 void PostprocessingStage::initialize()
 {
     postprocessedFrame.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
-    
+
     m_fbo = new globjects::Framebuffer();
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, postprocessedFrame.data());
 
@@ -163,6 +163,6 @@ void PostprocessingStage::process()
 
 void PostprocessingStage::resizeTexture(int width, int height)
 {
-    postprocessedFrame.data()->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    postprocessedFrame.data()->image2D(0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     m_fbo->printStatus(true);
 }

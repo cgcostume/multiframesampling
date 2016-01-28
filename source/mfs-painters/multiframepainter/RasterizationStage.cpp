@@ -26,7 +26,7 @@ RasterizationStage::RasterizationStage()
 
     addInput("projection", projection);
     addInput("viewport", viewport);
-    addInput("camera", camera); 
+    addInput("camera", camera);
     addInput("drawables", drawables);
 
     addOutput("color", color);
@@ -87,8 +87,8 @@ void RasterizationStage::process()
 
 void RasterizationStage::resizeTextures(int width, int height)
 {
-    color.data()->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-    normal.data()->image2D(0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    color.data()->image2D(0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    normal.data()->image2D(0, GL_RGBA32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
     depth.data()->image2D(0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     m_fbo->printStatus(true);
 }
