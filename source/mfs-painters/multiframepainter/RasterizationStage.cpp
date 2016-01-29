@@ -120,9 +120,14 @@ void RasterizationStage::render()
     );
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
 
+    m_program->setUniform("modelView", camera.data()->view());
+    m_program->setUniform("projection", projection.data()->projection());
+
     // offset needs to be doubled, because ndc range is [-1;1] and not [0;1]
     m_program->setUniform("ndcOffset", 2.0f * subpixelSample / viewportSize);
-    m_program->setUniform("mvp", projection.data()->projection() * camera.data()->view());
+    
+    m_program->setUniform("cocPoint", glm::diskRand(0.0f));
+    m_program->setUniform("focalDist", 3.f);
 
     for (auto& drawable : drawables.data())
     {
