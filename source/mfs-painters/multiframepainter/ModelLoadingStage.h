@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TypeDefinitions.h"
+
 #include <string>
 #include <vector>
 
@@ -17,8 +19,6 @@ class ModelLoadingStage : public gloperate::AbstractStage
 {
 public:
     ModelLoadingStage();
-
-    using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
 
     gloperate::InputSlot<gloperate::ResourceManager*> resourceManager;
     gloperate::InputSlot<std::string> modelFilename;

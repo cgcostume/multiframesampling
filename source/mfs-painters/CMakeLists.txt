@@ -45,6 +45,7 @@ set(headers
     ${include_path}/multiframepainter/FrameAccumulationStage.h
     ${include_path}/multiframepainter/BlitStage.h
 
+    ${include_path}/multiframepainter/TypeDefinitions.h
     ${include_path}/singleframepainter/SingleFramePainter.h
 )
 

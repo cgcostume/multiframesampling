@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TypeDefinitions.h"
+
 #include <vector>
 
 #include <globjects/base/ref_ptr.h>
@@ -30,8 +32,6 @@ public:
     RasterizationStage();
 
     virtual void initialize() override;
-
-    using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
 
     gloperate::InputSlot<gloperate::AbstractPerspectiveProjectionCapability *> projection;
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
