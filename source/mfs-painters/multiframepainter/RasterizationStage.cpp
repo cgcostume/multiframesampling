@@ -11,6 +11,7 @@
 #include <globjects/Program.h>
 #include <globjects/Shader.h>
 
+#include <gloperate/base/make_unique.hpp>
 #include <gloperate/painter/AbstractPerspectiveProjectionCapability.h>
 #include <gloperate/painter/AbstractViewportCapability.h>
 #include <gloperate/painter/AbstractCameraCapability.h>
@@ -18,7 +19,12 @@
 #include <gloperate/primitives/PolygonalDrawable.h>
 
 using namespace gl;
+using gloperate::make_unique;
 
+namespace
+{
+    const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
+}
 
 RasterizationStage::RasterizationStage()
 {
@@ -37,6 +43,8 @@ RasterizationStage::RasterizationStage()
 void RasterizationStage::initialize()
 {
     setupGLState();
+
+    m_shadowmap = make_unique<OmnidirectionalShadowmap>();
 
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
@@ -95,6 +103,8 @@ void RasterizationStage::resizeTextures(int width, int height)
 
 void RasterizationStage::render()
 {
+    m_shadowmap->render(lightPosition, drawables.data());
+
     glViewport(viewport.data()->x(),
                viewport.data()->y(),
                viewport.data()->width(),
@@ -129,6 +139,10 @@ void RasterizationStage::render()
     m_program->setUniform("cocPoint", glm::diskRand(0.0f));
     m_program->setUniform("focalDist", 3.f);
 
+    m_program->setUniform("shadowmap", 0);
+    m_program->setUniform("worldLightPos", lightPosition);
+    m_shadowmap->distanceTexture()->bindActive(0);
+
     for (auto& drawable : drawables.data())
     {
         drawable->draw();
@@ -143,4 +157,5 @@ void RasterizationStage::setupGLState()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }

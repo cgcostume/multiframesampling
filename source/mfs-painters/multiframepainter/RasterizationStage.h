@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TypeDefinitions.h"
+#include "OmnidirectionalShadowmap.h"
 
 #include <vector>
 
@@ -51,6 +52,8 @@ protected:
     void resizeTextures(int width, int height);
     void setupGLState();
     void render();
+
+    std::unique_ptr<OmnidirectionalShadowmap> m_shadowmap;
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<globjects::Program> m_program;
