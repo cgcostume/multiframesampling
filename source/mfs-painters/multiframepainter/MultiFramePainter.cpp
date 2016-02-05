@@ -58,6 +58,8 @@ MultiFramePainter::~MultiFramePainter()
 
 void MultiFramePainter::onInitialize()
 {
+    gloperate::registerNamedStrings("data/shaders", "glsl", true);
+
     PipelinePainter::onInitialize();
 }
 
