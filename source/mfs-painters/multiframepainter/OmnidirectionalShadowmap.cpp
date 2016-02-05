@@ -23,7 +23,7 @@ using namespace gl;
 
 namespace
 {
-    const int size = 256;
+    const int size = 512;
 
     const float cameraNearPlane = 0.1f;
     const float cameraFarPlane = 4.0f;

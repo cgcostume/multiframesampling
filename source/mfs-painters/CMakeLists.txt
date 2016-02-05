@@ -45,6 +45,7 @@ set(headers
     ${include_path}/multiframepainter/FrameAccumulationStage.h
     ${include_path}/multiframepainter/BlitStage.h
 
+    ${include_path}/multiframepainter/GroundPlane.h
     ${include_path}/multiframepainter/TypeDefinitions.h
     ${include_path}/multiframepainter/OmnidirectionalShadowmap.h
     
@@ -62,6 +63,7 @@ set(sources
     ${source_path}/multiframepainter/FrameAccumulationStage.cpp
     ${source_path}/multiframepainter/BlitStage.cpp
 
+    ${source_path}/multiframepainter/GroundPlane.cpp
     ${source_path}/multiframepainter/OmnidirectionalShadowmap.cpp
     
     ${source_path}/singleframepainter/SingleFramePainter.cpp

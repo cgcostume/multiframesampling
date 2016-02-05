@@ -2,6 +2,7 @@
 
 #include "TypeDefinitions.h"
 #include "OmnidirectionalShadowmap.h"
+#include "GroundPlane.h"
 
 #include <vector>
 
@@ -54,6 +55,7 @@ protected:
     void render();
 
     std::unique_ptr<OmnidirectionalShadowmap> m_shadowmap;
+    std::unique_ptr<GroundPlane> m_groundPlane;
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<globjects::Program> m_program;

@@ -45,6 +45,7 @@ void RasterizationStage::initialize()
     setupGLState();
 
     m_shadowmap = make_unique<OmnidirectionalShadowmap>();
+    m_groundPlane = make_unique<GroundPlane>(-1.5f);
 
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
@@ -103,7 +104,10 @@ void RasterizationStage::resizeTextures(int width, int height)
 
 void RasterizationStage::render()
 {
-    m_shadowmap->render(lightPosition, drawables.data());
+    auto frameLightOffset = glm::circularRand(0.05f);
+    auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0, frameLightOffset.y);
+
+    m_shadowmap->render(frameLightPosition, drawables.data());
 
     glViewport(viewport.data()->x(),
                viewport.data()->y(),
@@ -140,7 +144,7 @@ void RasterizationStage::render()
     m_program->setUniform("focalDist", 3.f);
 
     m_program->setUniform("shadowmap", 0);
-    m_program->setUniform("worldLightPos", lightPosition);
+    m_program->setUniform("worldLightPos", frameLightPosition);
     m_shadowmap->distanceTexture()->bindActive(0);
 
     for (auto& drawable : drawables.data())
@@ -149,6 +153,12 @@ void RasterizationStage::render()
     }
 
     m_program->release();
+
+    m_groundPlane->program()->setUniform("mvp", projection.data()->projection() * camera.data()->view());
+    m_groundPlane->program()->setUniform("shadowmap", 0);
+    m_groundPlane->program()->setUniform("worldLightPos", frameLightPosition);
+    m_groundPlane->draw();
+
     m_fbo->unbind();
 }
 
