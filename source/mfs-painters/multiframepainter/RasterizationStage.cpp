@@ -134,17 +134,21 @@ void RasterizationStage::render()
     );
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
 
-    m_program->setUniform("modelView", camera.data()->view());
-    m_program->setUniform("projection", projection.data()->projection());
+    for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
+    {
+        program->setUniform("shadowmap", 0);
+        program->setUniform("worldLightPos", frameLightPosition);
 
-    // offset needs to be doubled, because ndc range is [-1;1] and not [0;1]
-    m_program->setUniform("ndcOffset", 2.0f * subpixelSample / viewportSize);
+        program->setUniform("modelView", camera.data()->view());
+        program->setUniform("projection", projection.data()->projection());
+
+        // offset needs to be doubled, because ndc range is [-1;1] and not [0;1]
+        program->setUniform("ndcOffset", 2.0f * subpixelSample / viewportSize);
+        
+        program->setUniform("cocPoint", glm::diskRand(0.0f));
+        program->setUniform("focalDist", 3.f);
+    }
     
-    m_program->setUniform("cocPoint", glm::diskRand(0.0f));
-    m_program->setUniform("focalDist", 3.f);
-
-    m_program->setUniform("shadowmap", 0);
-    m_program->setUniform("worldLightPos", frameLightPosition);
     m_shadowmap->distanceTexture()->bindActive(0);
 
     for (auto& drawable : drawables.data())
@@ -154,9 +158,6 @@ void RasterizationStage::render()
 
     m_program->release();
 
-    m_groundPlane->program()->setUniform("mvp", projection.data()->projection() * camera.data()->view());
-    m_groundPlane->program()->setUniform("shadowmap", 0);
-    m_groundPlane->program()->setUniform("worldLightPos", frameLightPosition);
     m_groundPlane->draw();
 
     m_fbo->unbind();
