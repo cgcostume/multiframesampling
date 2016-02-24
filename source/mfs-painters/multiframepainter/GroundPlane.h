@@ -19,12 +19,11 @@ class GroundPlane
 public:
     GroundPlane(float height);
 
-    void draw();
+    void draw(globjects::Program* program = nullptr) const;
     globjects::Program * program();
     gloperate::VertexDrawable * drawable();
 
 protected:
     globjects::ref_ptr<globjects::Program> m_program;
-    globjects::ref_ptr<globjects::Program> m_shadowProgram;
     globjects::ref_ptr<gloperate::VertexDrawable> m_drawable;
 };

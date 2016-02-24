@@ -1,5 +1,7 @@
 #include "OmnidirectionalShadowmap.h"
 
+#include "GroundPlane.h"
+
 #include <limits>
 #include <memory>
 
@@ -115,7 +117,7 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     fbo->unbind();
 }
 
-void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables)
+void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane)
 {
     auto getTransforms = [](const glm::vec3 &eye) -> std::vector<glm::mat4>
     {
@@ -145,6 +147,9 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
     m_shadowmapProgram->use();
     m_shadowmapProgram->setUniform("transforms", getTransforms(eye));
     m_shadowmapProgram->setUniform("lightWorldPos", eye);
+    groundPlane.draw(m_shadowmapProgram);
+
+    m_shadowmapProgram->use();
     for (const auto & drawable : drawables)
     { 
         drawable->draw();

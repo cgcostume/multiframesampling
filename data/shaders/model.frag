@@ -14,7 +14,7 @@ uniform vec3 worldLightPos;
 
 void main()
 {
-    float shadowFactor = omnishadowmapComparison(shadowmap, v_worldCoord, worldLightPos);
+    float shadowFactor = omnishadowmapComparisonVSM(shadowmap, v_worldCoord, worldLightPos);
 
     outColor = v_normal * 0.5 + 0.5;
     outColor *= shadowFactor;

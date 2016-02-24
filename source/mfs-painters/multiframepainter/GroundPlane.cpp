@@ -35,11 +35,16 @@ GroundPlane::GroundPlane(float height)
     m_drawable->enableAll();
 }
 
-void GroundPlane::draw()
+void GroundPlane::draw(globjects::Program* program) const
 {
-    m_program->use();
+    if (program == nullptr) 
+    {
+        program = m_program;
+    }
+
+    program->use();
     m_drawable->draw();
-    m_program->release();
+    program->release();
 }
 
 globjects::Program * GroundPlane::program()

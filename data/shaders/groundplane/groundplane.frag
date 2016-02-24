@@ -13,6 +13,6 @@ layout (location = 1) out vec3 out_normal;
 
 void main()
 {
-    out_color = vec3(1.0) * omnishadowmapComparison(shadowmap, worldPos, worldLightPos);
+    out_color = vec3(1.0) * omnishadowmapComparisonVSM(shadowmap, worldPos, worldLightPos);
     out_normal = vec3(0.0, 1.0, 0.0);
 }
