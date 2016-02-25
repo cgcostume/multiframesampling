@@ -28,7 +28,7 @@ namespace
 {
     const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
     const auto lightRadius = 0.02f;
-    const auto transparency = 0.5f;
+    const auto alpha = 0.7f;
     const auto focalDist = 3.0f;
     const auto focalPoint = glm::vec2(0.0f);
 }
@@ -114,6 +114,11 @@ void RasterizationStage::resizeTextures(int width, int height)
 
 void RasterizationStage::render()
 {
+    for (auto program : std::vector<globjects::Program*>{ m_program, m_shadowmap->program() })
+    {
+        program->setUniform("alpha", alpha);
+    }
+
     auto frameLightOffset = glm::circularRand(lightRadius);
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);
 
@@ -157,8 +162,7 @@ void RasterizationStage::render()
 
         // offset needs to be doubled, because ndc range is [-1;1] and not [0;1]
         program->setUniform("ndcOffset", 2.0f * subpixelSample / viewportSize);
-        
-        program->setUniform("transparency", transparency);
+
         program->setUniform("masksOffset", static_cast<float>(currentFrame.data()) / TransparencyMasksGenerator::s_numMasks);
 
         program->setUniform("cocPoint", focalPoint);

@@ -27,10 +27,11 @@ class OmnidirectionalShadowmap
 public:
     OmnidirectionalShadowmap();
 
-    void render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane);
+    void render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane) const;
     void setBlurSize(int blurSize);
 
-    globjects::Texture * distanceTexture();
+    globjects::Program * program() const;
+    globjects::Texture * distanceTexture() const;
 
 protected:
     void setupFbo(globjects::Framebuffer * fbo, globjects::Texture * colorBuffer, globjects::Texture * depthBuffer, int size);

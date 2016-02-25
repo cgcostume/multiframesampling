@@ -15,12 +15,12 @@ uniform samplerCube shadowmap;
 uniform sampler2D masksTexture;
 uniform sampler3D noiseTexture;
 uniform float masksOffset;
-uniform float transparency;
+uniform float alpha;
 uniform vec3 worldLightPos;
 
 void main()
 {
-    if (fragmentDiscard(transparency, 0, masksTexture, rand(noiseTexture, v_worldCoord, masksOffset)))
+    if (fragmentDiscard(alpha, 0, masksTexture, rand(noiseTexture, v_worldCoord, masksOffset)))
     {
         discard;
     }

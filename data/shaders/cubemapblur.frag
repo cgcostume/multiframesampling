@@ -2,7 +2,7 @@
 
 in vec3 g_direction;
 
-layout (location = 0) out vec2 out_color;
+layout (location = 0) out vec3 out_color;
 
 uniform samplerCube shadowMap;
 uniform vec2 direction;
@@ -43,13 +43,13 @@ void main()
     vec3 sampleDirection = normalize(g_direction);
     int face = calcFace(sampleDirection);
 
-    out_color = vec2(0.0);
+    out_color = vec3(0.0);
     int count = 0;
     for (int x = -kernelsize; x <= kernelsize; ++x)
     {
     	++count;
-    	out_color += texture(shadowMap, sampleDirection + blurDirection(vec2(x) * direction, face) * sampleLength).rg;
+    	out_color += texture(shadowMap, sampleDirection + blurDirection(vec2(x) * direction, face) * sampleLength).rgb;
     }
 
-    out_color /= count;
+    out_color.rgb /= count;
 }

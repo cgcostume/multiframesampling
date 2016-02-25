@@ -96,7 +96,7 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     colorBuffer->bind();
     for (int i = 0; i < 6; ++i)
     {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<GLint>(GL_RG32F), size, size, 0, GL_RG, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<GLint>(GL_RGB32F), size, size, 0, GL_RGB, GL_FLOAT, nullptr);
     }
     colorBuffer->unbind();
     fbo->attachTexture(GL_COLOR_ATTACHMENT0, colorBuffer);
@@ -117,7 +117,7 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     fbo->unbind();
 }
 
-void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane)
+void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane) const
 {
     auto getTransforms = [](const glm::vec3 &eye) -> std::vector<glm::mat4>
     {
@@ -141,19 +141,21 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
 
     m_fbo->bind();
     m_fbo->clear(GL_DEPTH_BUFFER_BIT);
-    m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(std::numeric_limits<float>::max()));
+    auto maxFloat = std::numeric_limits<float>::max();
+    m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(maxFloat, maxFloat, 1.0f, 0.0f));
     m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-    m_shadowmapProgram->use();
     m_shadowmapProgram->setUniform("transforms", getTransforms(eye));
     m_shadowmapProgram->setUniform("lightWorldPos", eye);
-    groundPlane.draw(m_shadowmapProgram);
-
+    
     m_shadowmapProgram->use();
     for (const auto & drawable : drawables)
     {
         drawable->draw();
     }
+
+    groundPlane.draw(m_shadowmapProgram);
+
     m_shadowmapProgram->release();
 
     m_blurProgram->setUniform("transforms", getTransforms(glm::vec3(0.0f)));
@@ -187,7 +189,12 @@ void OmnidirectionalShadowmap::setBlurSize(int blurSize)
     m_blurSize = blurSize;
 }
 
-globjects::Texture * OmnidirectionalShadowmap::distanceTexture()
+globjects::Program* OmnidirectionalShadowmap::program() const
+{
+    return m_shadowmapProgram;
+}
+
+globjects::Texture * OmnidirectionalShadowmap::distanceTexture() const
 {
     return m_colorTextureBlur;
 }

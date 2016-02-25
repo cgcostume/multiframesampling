@@ -13,7 +13,7 @@ float VSM(vec2 moments, float compare)
     float p = smoothstep(compare-0.001, compare, moments.x);
     float variance = max(moments.y - moments.x*moments.x, -0.001);
     float d = compare - moments.x;
-    float p_max = linstep(0.2, 1.0, variance / (variance + d*d));
+    float p_max = linstep(0.3, 1.0, variance / (variance + d*d));
     return clamp(max(p, p_max), 0.0, 1.0);
 }
 
@@ -21,8 +21,14 @@ float omnishadowmapComparisonVSM(samplerCube shadowmap, vec3 worldPos, vec3 worl
 {
     vec3 lightDirection = worldPos - worldLightPos;
     float dist = length(lightDirection);
-    vec2 moments = texture(shadowmap, lightDirection).rg;
-    return VSM(moments, dist);
+    vec3 texel = texture(shadowmap, lightDirection).rgb;
+    vec2 moments = texel.rg;
+    float alpha = texel.b;
+    float shadowFactor = VSM(moments, dist);
+
+    float transparency = 1.0 - alpha; // range [0;1]
+    float temp = transparency * (1.0 - shadowFactor); // map to [0.0; 1.0 - shadowFactor]
+    return temp + shadowFactor; // map to [shadowFactor; 1.0]
 }
 
 float omnishadowmapComparison(samplerCube shadowmap, vec3 worldPos, vec3 worldLightPos)
