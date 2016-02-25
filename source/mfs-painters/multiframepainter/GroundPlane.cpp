@@ -15,7 +15,7 @@ using namespace gl;
 
 namespace
 {
-    const auto size = 16.0f;
+    const auto size = 100.0f;
     const auto filePath = std::string{ "data/shaders/groundplane/" };
 }
 

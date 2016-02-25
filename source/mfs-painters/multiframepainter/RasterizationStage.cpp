@@ -24,6 +24,7 @@ using gloperate::make_unique;
 namespace
 {
     const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
+    const auto lightRadius = 0.02f;
 }
 
 RasterizationStage::RasterizationStage()
@@ -58,6 +59,7 @@ void RasterizationStage::initialize()
 
     camera.data()->setEye({ 1.0575, 0.7301, -1.59997 });
     camera.data()->setCenter({ -0.618056, -0.782045, 1.98035 });
+    projection.data()->setZFar(50.0f);
 
     m_program = new globjects::Program();
     m_program->attach(
@@ -104,7 +106,7 @@ void RasterizationStage::resizeTextures(int width, int height)
 
 void RasterizationStage::render()
 {
-    auto frameLightOffset = glm::circularRand(0.05f);
+    auto frameLightOffset = glm::circularRand(lightRadius);
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0, frameLightOffset.y);
 
     m_shadowmap->render(frameLightPosition, drawables.data(), *m_groundPlane.get());

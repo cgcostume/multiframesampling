@@ -28,7 +28,7 @@ namespace
     const int size = 512;
 
     const float cameraNearPlane = 0.1f;
-    const float cameraFarPlane = 5.0f;
+    const float cameraFarPlane = 100.0f;
 
     const glm::vec3 viewDirs[] = { glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1) };
     const glm::vec3 ups[] = { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
