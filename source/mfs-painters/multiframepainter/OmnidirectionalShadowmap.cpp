@@ -96,7 +96,7 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     colorBuffer->bind();
     for (int i = 0; i < 6; ++i)
     {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<GLint>(GL_RGB32F), size, size, 0, GL_RGB, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, static_cast<GLint>(GL_RGBA32F), size, size, 0, GL_RGB, GL_FLOAT, nullptr);
     }
     colorBuffer->unbind();
     fbo->attachTexture(GL_COLOR_ATTACHMENT0, colorBuffer);
@@ -147,7 +147,7 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
 
     m_shadowmapProgram->setUniform("transforms", getTransforms(eye));
     m_shadowmapProgram->setUniform("lightWorldPos", eye);
-    
+
     m_shadowmapProgram->use();
     for (const auto & drawable : drawables)
     {
