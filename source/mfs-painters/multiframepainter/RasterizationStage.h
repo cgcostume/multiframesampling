@@ -3,6 +3,7 @@
 #include "TypeDefinitions.h"
 #include "OmnidirectionalShadowmap.h"
 #include "GroundPlane.h"
+#include "NoiseTexture.h"
 
 #include <vector>
 
@@ -51,7 +52,8 @@ protected:
     virtual void process() override;
 
     void resizeTextures(int width, int height);
-    void setupGLState();
+    static void setupGLState();
+    void setupMasksTexture();
     void render();
 
     std::unique_ptr<OmnidirectionalShadowmap> m_shadowmap;
@@ -59,4 +61,7 @@ protected:
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<globjects::Program> m_program;
+
+    globjects::ref_ptr<globjects::Texture> m_masksTexture;
+    std::unique_ptr<NoiseTexture> m_noiseTexture;
 };

@@ -48,6 +48,8 @@ set(headers
     ${include_path}/multiframepainter/GroundPlane.h
     ${include_path}/multiframepainter/TypeDefinitions.h
     ${include_path}/multiframepainter/OmnidirectionalShadowmap.h
+    ${include_path}/multiframepainter/TransparencyMasksGenerator.h
+    ${include_path}/multiframepainter/NoiseTexture.h
     
     ${include_path}/singleframepainter/SingleFramePainter.h
 )
@@ -65,6 +67,8 @@ set(sources
 
     ${source_path}/multiframepainter/GroundPlane.cpp
     ${source_path}/multiframepainter/OmnidirectionalShadowmap.cpp
+    ${source_path}/multiframepainter/TransparencyMasksGenerator.cpp
+    ${source_path}/multiframepainter/NoiseTexture.cpp
     
     ${source_path}/singleframepainter/SingleFramePainter.cpp
 )
