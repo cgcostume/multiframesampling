@@ -1,7 +1,5 @@
 #include "OmnidirectionalShadowmap.h"
 
-#include "GroundPlane.h"
-
 #include <limits>
 #include <memory>
 
@@ -20,6 +18,8 @@
 
 #include <gloperate/primitives/VertexDrawable.h>
 #include <gloperate/primitives/PolygonalDrawable.h>
+
+#include "GroundPlane.h"
 
 using namespace gl;
 

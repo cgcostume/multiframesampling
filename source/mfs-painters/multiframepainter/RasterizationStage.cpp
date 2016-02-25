@@ -1,8 +1,5 @@
 #include "RasterizationStage.h"
 
-#include "TransparencyMasksGenerator.h"
-#include "NoiseTexture.h"
-
 #include <glbinding/gl/enum.h>
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl/boolean.h>
@@ -20,6 +17,9 @@
 #include <gloperate/painter/AbstractCameraCapability.h>
 
 #include <gloperate/primitives/PolygonalDrawable.h>
+
+#include "TransparencyMasksGenerator.h"
+#include "NoiseTexture.h"
 
 using namespace gl;
 using gloperate::make_unique;

@@ -1,12 +1,10 @@
 #pragma once
 
-#include "TypeDefinitions.h"
-
-#include <vector>
-
 #include <glm/fwd.hpp>
 
 #include <globjects/base/ref_ptr.h>
+
+#include "TypeDefinitions.h"
 
 namespace globjects
 {

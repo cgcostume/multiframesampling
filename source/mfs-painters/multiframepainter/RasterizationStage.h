@@ -1,17 +1,15 @@
 #pragma once
 
-#include "TypeDefinitions.h"
-#include "OmnidirectionalShadowmap.h"
-#include "GroundPlane.h"
-#include "NoiseTexture.h"
-
-#include <vector>
-
 #include <globjects/base/ref_ptr.h>
 
 #include <gloperate/pipeline/AbstractStage.h>
 #include <gloperate/pipeline/InputSlot.h>
 #include <gloperate/pipeline/Data.h>
+
+#include "TypeDefinitions.h"
+#include "OmnidirectionalShadowmap.h"
+#include "GroundPlane.h"
+#include "NoiseTexture.h"
 
 namespace globjects
 {

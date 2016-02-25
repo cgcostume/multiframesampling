@@ -1,13 +1,12 @@
 #pragma once
 
-#include "TypeDefinitions.h"
-
-#include <string>
 #include <vector>
 
 #include <gloperate/pipeline/AbstractStage.h>
 #include <gloperate/pipeline/InputSlot.h>
 #include <gloperate/pipeline/Data.h>
+
+#include "TypeDefinitions.h"
 
 namespace gloperate
 {
