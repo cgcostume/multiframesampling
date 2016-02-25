@@ -29,8 +29,8 @@ namespace
     const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
     const auto lightRadius = 0.02f;
     const auto alpha = 0.7f;
-    const auto focalDist = 3.0f;
-    const auto focalPoint = glm::vec2(0.0f);
+    const auto focalDist = 2.0f;
+    const auto focalPointRadius = 0.0f;
 }
 
 RasterizationStage::RasterizationStage()
@@ -148,6 +148,7 @@ void RasterizationStage::render()
         glm::linearRand(-range, range)
     );
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
+    auto focalPoint = glm::diskRand(focalPointRadius);
 
     for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
     {
