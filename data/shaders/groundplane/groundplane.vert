@@ -11,7 +11,7 @@ uniform vec2 ndcOffset;
 uniform vec2 cocPoint;
 uniform float focalDist;
 
-out vec3 worldPos;
+out vec3 g_worldCoord;
 
 void main()
 {
@@ -19,5 +19,5 @@ void main()
     vec4 ndcVertex = subpixelShift(projection, viewVertex, ndcOffset);
 
     gl_Position = ndcVertex;
-    worldPos = in_position;
+    g_worldCoord = in_position;
 }

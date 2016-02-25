@@ -28,7 +28,7 @@ namespace
     const int size = 512;
 
     const float cameraNearPlane = 0.1f;
-    const float cameraFarPlane = 4.0f;
+    const float cameraFarPlane = 5.0f;
 
     const glm::vec3 viewDirs[] = { glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1) };
     const glm::vec3 ups[] = { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
@@ -151,7 +151,7 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
 
     m_shadowmapProgram->use();
     for (const auto & drawable : drawables)
-    { 
+    {
         drawable->draw();
     }
     m_shadowmapProgram->release();
@@ -174,7 +174,7 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
     m_blurredFbo->bind();
     m_colorTextureBlurTemp->bindActive(GL_TEXTURE0);
     m_blurProgram->setUniform("direction", glm::vec2(0.0f, 1.0f));
-    
+
     m_cube->draw();
 
     m_colorTextureBlurTemp->unbindActive(GL_TEXTURE0);

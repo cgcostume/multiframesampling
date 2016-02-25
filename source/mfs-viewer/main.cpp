@@ -73,7 +73,7 @@ int main(int argc, char * argv[])
     }
 
     AbstractPainterPlugin * painterPlugin = dynamic_cast<AbstractPainterPlugin *>(plugin);
-    if (!painterPlugin) 
+    if (!painterPlugin)
     {
         globjects::fatal() << "Plugin '" << name << "' is not a painter plugin.";
 
@@ -98,14 +98,14 @@ int main(int argc, char * argv[])
     window->installEventFilter(keyProvider);
     window->installEventFilter(mouseProvider);
     window->installEventFilter(wheelProvider);
-    
+
     // Create Mapping
     QtViewerMapping * mapping = new QtViewerMapping(window);
     mapping->setPainter(painter.get());
     mapping->addProvider(keyProvider);
     mapping->addProvider(mouseProvider);
     mapping->addProvider(wheelProvider);
-    
+
 
     QRect rect = QApplication::desktop()->screenGeometry(); // used to center the mainwindow on desktop
 
