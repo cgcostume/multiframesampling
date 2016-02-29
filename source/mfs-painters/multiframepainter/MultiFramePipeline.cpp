@@ -28,6 +28,7 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->multiFrameCount = multiFrameCount;
     rasterizationStage->drawables = modelLoadingStage->drawables;
     rasterizationStage->textureMap = modelLoadingStage->textureMap;
+    rasterizationStage->presetInformation = modelLoadingStage->presetInformation;
 
     postprocessingStage->viewport = viewport;
     postprocessingStage->camera = camera;

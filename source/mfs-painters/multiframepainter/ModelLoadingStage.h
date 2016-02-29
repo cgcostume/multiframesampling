@@ -28,9 +28,13 @@ public:
     gloperate::InputSlot<gloperate::ResourceManager*> resourceManager;
     gloperate::InputSlot<Preset> preset;
 
+    gloperate::Data<PresetInformation> presetInformation;
     gloperate::Data<PolygonalDrawables> drawables;
     gloperate::Data<IdTextureMap> textureMap;
 
 protected:
     virtual void process() override;
+
+    static PresetInformation getPresetInformation(Preset preset);
+    static std::string getFilename(Preset preset);
 };

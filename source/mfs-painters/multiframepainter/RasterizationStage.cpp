@@ -26,8 +26,6 @@ using gloperate::make_unique;
 
 namespace
 {
-    const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
-    const auto lightRadius = 0.02f;
     const auto alpha = 1.0f;
     const auto focalDist = 2.0f;
     const auto focalPointRadius = 0.0f;
@@ -41,6 +39,8 @@ RasterizationStage::RasterizationStage()
     addInput("viewport", viewport);
     addInput("camera", camera);
     addInput("drawables", drawables);
+    addInput("presetInformation", presetInformation);
+    addInput("textureMap", textureMap);
 
     addOutput("color", color);
     addOutput("normal", normal);
@@ -54,8 +54,7 @@ void RasterizationStage::initialize()
 
     m_noiseTexture = make_unique<NoiseTexture>(3u, 3u);
     m_shadowmap = make_unique<OmnidirectionalShadowmap>();
-    m_groundPlane = make_unique<GroundPlane>(-1.5f);
-
+    
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     depth.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
@@ -99,6 +98,16 @@ void RasterizationStage::process()
         return;
     }
 
+    if (presetInformation.hasChanged())
+    {
+        camera.data()->setEye(presetInformation.data().camEye);
+        camera.data()->setCenter(presetInformation.data().camCenter);
+        projection.data()->setZNear(presetInformation.data().nearFar.x);
+        projection.data()->setZFar(presetInformation.data().nearFar.y);
+
+        m_groundPlane = make_unique<GroundPlane>(presetInformation.data().groundHeight);
+    }
+    
     render();
 
     invalidateOutputs();
@@ -118,6 +127,9 @@ void RasterizationStage::render()
     {
         program->setUniform("alpha", alpha);
     }
+
+    auto lightPosition = presetInformation.data().lightPosition;
+    auto lightRadius = presetInformation.data().lightMaxShift;
 
     auto frameLightOffset = glm::circularRand(lightRadius);
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);

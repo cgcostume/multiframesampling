@@ -29,4 +29,5 @@ struct PresetInformation
     glm::vec2 nearFar;
     glm::vec3 lightPosition;
     float lightMaxShift;
+    float groundHeight;
 };

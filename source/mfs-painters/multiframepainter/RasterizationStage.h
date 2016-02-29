@@ -40,6 +40,7 @@ public:
     gloperate::InputSlot<PolygonalDrawables> drawables;
     gloperate::InputSlot<IdTextureMap> textureMap;
     gloperate::InputSlot<int> multiFrameCount;
+    gloperate::InputSlot<PresetInformation> presetInformation;
 
     gloperate::Data<int> currentFrame;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> color;
