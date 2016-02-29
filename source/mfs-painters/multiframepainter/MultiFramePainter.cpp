@@ -50,6 +50,8 @@ MultiFramePainter::MultiFramePainter(ResourceManager & resourceManager, const cp
     m_cameraCapability->changed.connect([this](){ m_pipeline.camera.invalidate(); });
     m_viewportCapability->changed.connect([this]() { m_pipeline.viewport.invalidate(); });
     m_projectionCapability->changed.connect([this]() { m_pipeline.projection.invalidate(); });
+
+    addProperty(createProperty("Preset", m_pipeline.preset));
 }
 
 MultiFramePainter::~MultiFramePainter()

@@ -28,7 +28,7 @@ namespace
 {
     const auto lightPosition = glm::vec3(0.0f, 2.0f, 0.0f);
     const auto lightRadius = 0.02f;
-    const auto alpha = 0.7f;
+    const auto alpha = 1.0f;
     const auto focalDist = 2.0f;
     const auto focalPointRadius = 0.0f;
 }
@@ -155,6 +155,7 @@ void RasterizationStage::render()
         program->setUniform("shadowmap", 0);
         program->setUniform("masksTexture", 1);
         program->setUniform("noiseTexture", 2);
+        program->setUniform("diffuseTexture", 3);
 
         program->setUniform("worldLightPos", frameLightPosition);
 
@@ -176,6 +177,17 @@ void RasterizationStage::render()
 
     for (auto& drawable : drawables.data())
     {
+        auto id = drawable->materialIndex();
+        if (textureMap.data().count(id) > 0)
+        {
+            m_program->setUniform("useDiffuseTexture", true);
+            textureMap.data().at(id)->bindActive(3);
+        }
+        else
+        {
+            m_program->setUniform("useDiffuseTexture", false);
+        }
+        
         drawable->draw();
     }
 

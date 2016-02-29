@@ -10,6 +10,7 @@
 #include <QOpenGLContext>
 #include <gloperate/ext-includes-end.h>
 
+
 #include <globjects/base/baselogging.h>
 
 #include <gloperate/plugin/PluginManager.h>
@@ -23,6 +24,7 @@
 #include <gloperate-qt/viewer/QtKeyEventProvider.h>
 #include <gloperate-qt/viewer/QtMouseEventProvider.h>
 #include <gloperate-qt/viewer/QtWheelEventProvider.h>
+#include <gloperate-qt/viewer/Viewer.h>
 
 #include "QtViewerMapping.h"
 
@@ -83,7 +85,7 @@ int main(int argc, char * argv[])
     painter.reset(painterPlugin->createPainter(resourceManager));
 
     // Create Event Provider
-    QtKeyEventProvider * keyProvider = new QtKeyEventProvider();
+    /*QtKeyEventProvider * keyProvider = new QtKeyEventProvider();
     QtMouseEventProvider * mouseProvider = new QtMouseEventProvider();
     QtWheelEventProvider * wheelProvider = new QtWheelEventProvider();
 
@@ -115,7 +117,11 @@ int main(int argc, char * argv[])
     mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
     mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
 
-    mainWindow.show();
+    mainWindow.show();*/
+
+    gloperate_qt::Viewer viewer;
+    viewer.show();
+    viewer.loadPainter(name);
 
     return app.exec();
 }

@@ -7,6 +7,12 @@
 #include <gloperate/pipeline/Data.h>
 
 #include "TypeDefinitions.h"
+#include "Preset.h"
+
+namespace globjects
+{
+    class Texture;
+}
 
 namespace gloperate
 {
@@ -20,9 +26,10 @@ public:
     ModelLoadingStage();
 
     gloperate::InputSlot<gloperate::ResourceManager*> resourceManager;
-    gloperate::InputSlot<std::string> modelFilename;
+    gloperate::InputSlot<Preset> preset;
 
     gloperate::Data<PolygonalDrawables> drawables;
+    gloperate::Data<IdTextureMap> textureMap;
 
 protected:
     virtual void process() override;

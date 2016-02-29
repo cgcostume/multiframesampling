@@ -47,6 +47,7 @@ set(headers
 
     ${include_path}/multiframepainter/GroundPlane.h
     ${include_path}/multiframepainter/TypeDefinitions.h
+    ${include_path}/multiframepainter/Preset.h
     ${include_path}/multiframepainter/OmnidirectionalShadowmap.h
     ${include_path}/multiframepainter/TransparencyMasksGenerator.h
     ${include_path}/multiframepainter/NoiseTexture.h

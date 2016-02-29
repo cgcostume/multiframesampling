@@ -10,8 +10,8 @@
 MultiFramePipeline::MultiFramePipeline()
 : gloperate::AbstractPipeline("MultiframeSampling")
 , resourceManager(nullptr)
-, modelFilename("data/transparency_scene.obj")
 , multiFrameCount(64)
+, preset(Preset::Jakobi)
 {
     auto modelLoadingStage = new ModelLoadingStage();
     auto rasterizationStage = new RasterizationStage();
@@ -20,13 +20,14 @@ MultiFramePipeline::MultiFramePipeline()
     auto blitStage = new BlitStage();
 
     modelLoadingStage->resourceManager = resourceManager;
-    modelLoadingStage->modelFilename = modelFilename;
+    modelLoadingStage->preset = preset;
 
     rasterizationStage->projection = projection;
     rasterizationStage->camera = camera;
     rasterizationStage->viewport = viewport;
     rasterizationStage->multiFrameCount = multiFrameCount;
     rasterizationStage->drawables = modelLoadingStage->drawables;
+    rasterizationStage->textureMap = modelLoadingStage->textureMap;
 
     postprocessingStage->viewport = viewport;
     postprocessingStage->camera = camera;
