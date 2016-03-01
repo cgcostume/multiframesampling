@@ -86,7 +86,7 @@ PresetInformation ModelLoadingStage::getPresetInformation(Preset preset)
         //                          camera eye              camera center          near;far         light position          light radius     ground height
         { Preset::Imrod,          { { -10.0, 31.2, 10.65 }, { 30, 5.5, -30.0 },    { 0.3, 500.0 },  { 0, 54, 0 },           1.0f,            0.0f } },
         { Preset::CrytekSponza,   { { -1300, 250, -23 },    { 0.9, -1.9, -2.1 },   { 5.0, 3000.0 }, { 0, 2000, 0 },         15.0f,           0.0f } },
-        { Preset::DabrovicSponza, { { -10.0, 12.6, 0.9 },   { 3.2, 0.28, -1.82 },  { 0.3, 50.0 },   { 0, 18, 0 },           1.0f,            0.0f } }, // TODO
+        { Preset::DabrovicSponza, { { -10.0, 12.6, 0.9 },   { 3.2, 0.28, -1.82 },  { 0.3, 50.0 },   { 0, 18, 0 },           1.0f,            0.0f } },
         { Preset::Jakobi,         { { 0.39, 0.49, -0.63 },  { 0.05, -0.04, -0.1 }, { 0.02, 8.0 },   { -0.4, 1.2, -0.7 },    0.05f,          -0.12f } },
         { Preset::Megacity,       { { 0.26, 0.23, -0.35 },  { 0.14, 0.0, -0.14 },  { 0.02, 8.0 },   { -0.4, 1.2, -1.5 },    0.05f,           -0.12f } },
         { Preset::Mitusba,        { { 0.2, 3.7, 4.3 },      { 0.16, 0.07, -1.25 }, { 0.3, 30.0 },   { 10, 20, 0 },          0.7f,            0.0f } },
