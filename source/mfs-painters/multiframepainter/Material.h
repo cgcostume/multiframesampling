@@ -14,6 +14,13 @@ enum class TextureType
     Bump
 };
 
+enum class BumpType
+{
+    None,
+    Height,
+    Normal
+};
+
 class Material
 {
 public:

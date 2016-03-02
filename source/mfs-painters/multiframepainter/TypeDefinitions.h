@@ -30,4 +30,5 @@ struct PresetInformation
     glm::vec3 lightPosition;
     float lightMaxShift;
     float groundHeight;
+    BumpType bumpType;
 };

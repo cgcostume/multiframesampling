@@ -30,6 +30,15 @@ namespace
     const auto alpha = 1.0f;
     const auto focalDist = 2.0f;
     const auto focalPointRadius = 0.0f;
+
+    enum Sampler
+    {
+        ShadowSampler,
+        MaskSampler,
+        NoiseSampler,
+        DiffuseSampler,
+        BumpSampler
+    };
 }
 
 RasterizationStage::RasterizationStage()
@@ -165,12 +174,11 @@ void RasterizationStage::render()
 
     for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
     {
-        program->setUniform("shadowmap", 0);
-        program->setUniform("masksTexture", 1);
-        program->setUniform("noiseTexture", 2);
-        program->setUniform("diffuseTexture", 3);
-        program->setUniform("normalMap", 4);
-        program->setUniform("bumpMap", 5);
+        program->setUniform("shadowmap", ShadowSampler);
+        program->setUniform("masksTexture", MaskSampler);
+        program->setUniform("noiseTexture", NoiseSampler);
+        program->setUniform("diffuseTexture", DiffuseSampler);
+        program->setUniform("bumpTexture", BumpSampler);
 
         program->setUniform("worldLightPos", frameLightPosition);
 
@@ -186,9 +194,9 @@ void RasterizationStage::render()
         program->setUniform("focalDist", focalDist);
     }
     
-    m_shadowmap->distanceTexture()->bindActive(0);
-    m_masksTexture->bindActive(1);
-    m_noiseTexture->bindActive(2);
+    m_shadowmap->distanceTexture()->bindActive(ShadowSampler);
+    m_masksTexture->bindActive(MaskSampler);
+    m_noiseTexture->bindActive(NoiseSampler);
 
     for (auto& drawable : drawables.data())
     {
@@ -196,30 +204,24 @@ void RasterizationStage::render()
         auto& material = materialMap.data().at(id);
 
         bool hasDiffuseTex = material.hasTexture(TextureType::Diffuse);
-        bool hasNormalTex = material.hasTexture(TextureType::Normal);
         bool hasBumpTex = material.hasTexture(TextureType::Bump);
 
         if (hasDiffuseTex)
         {
             auto tex = material.textureMap().at(TextureType::Diffuse);
-            tex->bindActive(3);
+            tex->bindActive(DiffuseSampler);
         }
-
-        if (hasNormalTex)
-        {
-            auto tex = material.textureMap().at(TextureType::Normal);
-            tex->bindActive(4);
-        }
-
+        
+        auto bumpType = BumpType::None;
         if (hasBumpTex)
         {
+            bumpType = presetInformation.data().bumpType;
             auto tex = material.textureMap().at(TextureType::Bump);
-            tex->bindActive(5);
+            tex->bindActive(BumpSampler);
         }
-
+        
+        m_program->setUniform("bumpType", static_cast<int>(bumpType));
         m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
-        m_program->setUniform("useNormalMap", hasNormalTex);
-        m_program->setUniform("useBumpMap", hasBumpTex);
 
         drawable->draw();
     }
