@@ -43,7 +43,6 @@ namespace
 
     auto textureTypes = {
         aiTextureType_DIFFUSE,
-        aiTextureType_NORMALS,
         aiTextureType_EMISSIVE,
         aiTextureType_SPECULAR,
         aiTextureType_HEIGHT
@@ -53,7 +52,6 @@ namespace
     {
         static const std::map<aiTextureType, TextureType> conversion {
             { aiTextureType_DIFFUSE, TextureType::Diffuse },
-            { aiTextureType_NORMALS, TextureType::Normal },
             { aiTextureType_SPECULAR, TextureType::Specular },
             { aiTextureType_EMISSIVE, TextureType::Emissive },
             { aiTextureType_HEIGHT, TextureType::Bump },
@@ -166,7 +164,7 @@ PresetInformation ModelLoadingStage::getPresetInformation(Preset preset)
 {
     static const std::map<Preset, PresetInformation> conversion {
         //                          camera eye              camera center          near;far         light position          light radius     ground height  bump mapping type
-        { Preset::Imrod,          { { -10.0, 31.2, 10.65 }, { 30, 5.5, -30.0 },    { 0.3, 500.0 },  { 0, 40, 0 },           1.0f,            0.0f,          BumpType::Normal } },
+        { Preset::Imrod,          { { -10.0, 31.2, 10.65 }, { 30, 5.5, -30.0 },    { 0.3, 500.0 },  { 0, 52, 0 },           1.0f,            0.0f,          BumpType::Normal } },
         { Preset::CrytekSponza,   { { -1300, 250, -23 },    { 0.9, -1.9, -2.1 },   { 5.0, 5000.0 }, { 450, 270, -30 },      15.0f,          -10.0f,         BumpType::Height } },
         { Preset::DabrovicSponza, { { -10.0, 12.6, 0.9 },   { 3.2, 0.28, -1.82 },  { 0.3, 50.0 },   { 0, 18, 0 },           1.0f,            0.0f,          BumpType::Height } },
         { Preset::Jakobi,         { { 0.39, 0.49, -0.63 },  { 0.05, -0.04, -0.1 }, { 0.02, 8.0 },   { -0.4, 1.2, -0.7 },    0.05f,          -0.12f,         BumpType::None } },

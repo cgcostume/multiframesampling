@@ -8,7 +8,6 @@
 enum class TextureType
 {
     Diffuse,
-    Normal,
     Specular,
     Emissive,
     Bump

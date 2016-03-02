@@ -18,12 +18,15 @@ uniform sampler3D noiseTexture;
 
 uniform sampler2D diffuseTexture;
 uniform bool useDiffuseTexture;
+uniform sampler2D specularTexture;
+uniform bool useSpecularTexture;
 uniform sampler2D bumpTexture;
 uniform int bumpType;
 
 uniform float masksOffset;
 uniform float alpha;
 uniform vec3 worldLightPos;
+uniform vec3 cameraEye;
 
 #define BUMP_HEIGHT 1
 #define BUMP_NORMAL 2
@@ -57,19 +60,15 @@ void main()
     }
 
     vec2 uv = v_uv.xy;
-
     vec3 L = normalize(worldLightPos - v_worldCoord);
     vec3 N = normalize(v_normal);
-
+    vec3 V = normalize(cameraEye - v_worldCoord);
+    vec3 H = normalize(L + V);
+    float ndotl = dot(N, L);
+    float ndotH = dot(N, H);
     mat3 tbn = cotangent_frame(N, v_worldCoord, uv);
 
     float shadowFactor = omnishadowmapComparisonVSM(shadowmap, v_worldCoord, worldLightPos);
-
-    vec3 color = vec3(1.0);
-    if (useDiffuseTexture)
-    {
-        color = texture(diffuseTexture, uv).rgb;
-    }
 
     if (bumpType == BUMP_HEIGHT)
     {
@@ -88,10 +87,23 @@ void main()
         N = normalize(tbn * normalSample);
     }
 
-    vec3 ambientColor = ambientFactor * color;
-    vec3 diffuseColor = color * max(0.0, dot(N, L)) * shadowFactor;
+    vec3 diffuseColor = vec3(1.0);
+    if (useDiffuseTexture)
+    {
+        diffuseColor = texture(diffuseTexture, uv).rgb;
+    }
 
-    outColor = ambientColor + diffuseColor;
+    vec3 specularColor = vec3(0.0);
+    if (useSpecularTexture)
+    {
+        specularColor = texture(specularTexture, uv).rgb;
+    }
+
+    vec3 ambientTerm = ambientFactor * diffuseColor;
+    vec3 diffuseTerm = diffuseColor * max(0.0, ndotl) * shadowFactor;
+    vec3 specularTerm = specularColor * pow(max(0.0, ndotH), 40.0) * shadowFactor;
+
+    outColor = ambientTerm + diffuseTerm + specularTerm;
     outColor = clamp(outColor, 0.0, 1.0);
 
     outNormal = v_normal;

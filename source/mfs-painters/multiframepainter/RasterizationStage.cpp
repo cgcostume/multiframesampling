@@ -37,6 +37,7 @@ namespace
         MaskSampler,
         NoiseSampler,
         DiffuseSampler,
+        SpecularSampler,
         BumpSampler
     };
 }
@@ -178,10 +179,12 @@ void RasterizationStage::render()
         program->setUniform("masksTexture", MaskSampler);
         program->setUniform("noiseTexture", NoiseSampler);
         program->setUniform("diffuseTexture", DiffuseSampler);
+        program->setUniform("specularTexture", SpecularSampler);
         program->setUniform("bumpTexture", BumpSampler);
 
         program->setUniform("worldLightPos", frameLightPosition);
 
+        program->setUniform("cameraEye", camera.data()->eye());
         program->setUniform("modelView", camera.data()->view());
         program->setUniform("projection", projection.data()->projection());
 
@@ -205,11 +208,18 @@ void RasterizationStage::render()
 
         bool hasDiffuseTex = material.hasTexture(TextureType::Diffuse);
         bool hasBumpTex = material.hasTexture(TextureType::Bump);
+        bool hasSpecularTex = material.hasTexture(TextureType::Specular);
 
         if (hasDiffuseTex)
         {
             auto tex = material.textureMap().at(TextureType::Diffuse);
             tex->bindActive(DiffuseSampler);
+        }
+
+        if (hasSpecularTex)
+        {
+            auto tex = material.textureMap().at(TextureType::Diffuse);
+            tex->bindActive(SpecularSampler);
         }
         
         auto bumpType = BumpType::None;
@@ -222,6 +232,7 @@ void RasterizationStage::render()
         
         m_program->setUniform("bumpType", static_cast<int>(bumpType));
         m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
+        m_program->setUniform("useSpecularTexture", hasSpecularTex);
 
         drawable->draw();
     }
