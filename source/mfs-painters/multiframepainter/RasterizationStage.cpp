@@ -134,7 +134,7 @@ void RasterizationStage::render()
     auto frameLightOffset = glm::circularRand(lightRadius);
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);
 
-    m_shadowmap->render(frameLightPosition, drawables.data(), *m_groundPlane.get());
+    m_shadowmap->render(frameLightPosition, drawables.data(), *m_groundPlane.get(), presetInformation.data().nearFar.x, presetInformation.data().nearFar.y);
 
     glViewport(viewport.data()->x(),
                viewport.data()->y(),

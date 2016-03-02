@@ -27,9 +27,6 @@ namespace
 {
     const int size = 512;
 
-    const float cameraNearPlane = 0.1f;
-    const float cameraFarPlane = 100.0f;
-
     const glm::vec3 viewDirs[] = { glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1) };
     const glm::vec3 ups[] = { glm::vec3(0, -1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1), glm::vec3(0, -1, 0), glm::vec3(0, -1, 0) };
 
@@ -117,16 +114,18 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     fbo->unbind();
 }
 
-void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane) const
+void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane, float nearPlane, float farPlane) const
 {
-    auto getTransforms = [](const glm::vec3 &eye) -> std::vector<glm::mat4>
+    auto getTransforms = [nearPlane, farPlane](const glm::vec3 &eye, bool isCube) -> std::vector<glm::mat4>
     {
         std::vector<glm::mat4> transforms(6);
 
         for (int i = 0; i < 6; ++i)
         {
             auto curViewDir = viewDirs[i] + eye;
-            auto projection = glm::perspective(glm::radians(90.0f), 1.0f, cameraNearPlane, cameraFarPlane);
+            auto curNearPlane = isCube ? 0.1f : nearPlane;
+            auto curFarPlane = isCube ? 4.0f : farPlane;
+            auto projection = glm::perspective(glm::radians(90.0f), 1.0f, curNearPlane, curFarPlane);
             auto view = glm::lookAt(eye, curViewDir, ups[i]);
             transforms[i] = projection * view;
         }
@@ -140,12 +139,13 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
     glViewport(0, 0, size, size);
 
     m_fbo->bind();
-    m_fbo->clear(GL_DEPTH_BUFFER_BIT);
+    m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
+    
     auto maxFloat = std::numeric_limits<float>::max();
     m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(maxFloat, maxFloat, 1.0f, 0.0f));
-    m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
+    m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
 
-    m_shadowmapProgram->setUniform("transforms", getTransforms(eye));
+    m_shadowmapProgram->setUniform("transforms", getTransforms(eye, false));
     m_shadowmapProgram->setUniform("lightWorldPos", eye);
 
     m_shadowmapProgram->use();
@@ -158,7 +158,7 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
 
     m_shadowmapProgram->release();
 
-    m_blurProgram->setUniform("transforms", getTransforms(glm::vec3(0.0f)));
+    m_blurProgram->setUniform("transforms", getTransforms(glm::vec3(0.0f), true));
     m_blurProgram->setUniform("sizeFactor", 1.0f / size);
     m_blurProgram->setUniform("kernelsize", m_blurSize);
     m_blurProgram->setUniform("shadowMap", 0);
