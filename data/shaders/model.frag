@@ -30,7 +30,10 @@ uniform vec3 cameraEye;
 
 #define BUMP_HEIGHT 1
 #define BUMP_NORMAL 2
+
 const float ambientFactor = 0.25;
+const float specularFactor = 0.25;
+const float shininess = 20.0;
 
 // taken from http://www.thetenthplanet.de/archives/1180
 mat3 cotangent_frame(vec3 N, vec3 p, vec2 uv)
@@ -60,12 +63,7 @@ void main()
     }
 
     vec2 uv = v_uv.xy;
-    vec3 L = normalize(worldLightPos - v_worldCoord);
     vec3 N = normalize(v_normal);
-    vec3 V = normalize(cameraEye - v_worldCoord);
-    vec3 H = normalize(L + V);
-    float ndotl = dot(N, L);
-    float ndotH = dot(N, H);
     mat3 tbn = cotangent_frame(N, v_worldCoord, uv);
 
     float shadowFactor = omnishadowmapComparisonVSM(shadowmap, v_worldCoord, worldLightPos);
@@ -99,9 +97,15 @@ void main()
         specularColor = texture(specularTexture, uv).rgb;
     }
 
+    vec3 L = normalize(worldLightPos - v_worldCoord);
+    vec3 V = normalize(cameraEye - v_worldCoord);
+    vec3 H = normalize(L + V);
+    float ndotl = dot(N, L);
+    float ndotH = dot(N, H);
+
     vec3 ambientTerm = ambientFactor * diffuseColor;
     vec3 diffuseTerm = diffuseColor * max(0.0, ndotl) * shadowFactor;
-    vec3 specularTerm = specularColor * pow(max(0.0, ndotH), 40.0) * shadowFactor;
+    vec3 specularTerm = specularFactor * specularColor * pow(max(0.0, ndotH), shininess) * shadowFactor;
 
     outColor = ambientTerm + diffuseTerm + specularTerm;
     outColor = clamp(outColor, 0.0, 1.0);

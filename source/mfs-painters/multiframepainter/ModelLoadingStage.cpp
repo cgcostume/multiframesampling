@@ -144,7 +144,7 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
         auto type = translateAssimpTextureType(aiTexType);
 
         aiString texPath;
-        aiReturn ret = aiMat->GetTexture(aiTexType, 0, &texPath, nullptr, nullptr, nullptr, nullptr, nullptr);
+        aiReturn ret = aiMat->GetTexture(aiTexType, 0, &texPath);
         
         if (ret != aiReturn_SUCCESS)
             continue;
