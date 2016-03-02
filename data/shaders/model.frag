@@ -21,7 +21,7 @@ uniform float masksOffset;
 uniform float alpha;
 uniform vec3 worldLightPos;
 
-const vec3 ambientLight = vec3(0.25);
+const float ambientFactor = 0.25;
 
 void main()
 {
@@ -32,17 +32,24 @@ void main()
 
     float shadowFactor = omnishadowmapComparisonVSM(shadowmap, v_worldCoord, worldLightPos);
 
+    vec3 color;
     if (useDiffuseTexture)
     {
-        outColor = texture(diffuseTexture, v_uv.xy).rgb;
+        color = texture(diffuseTexture, v_uv.xy).rgb;
     }
     else
     {
-        outColor = vec3(1.0);
+        color = vec3(1.0);
     }
 
-    outColor *= shadowFactor;
-    outColor += ambientLight;
+    vec3 L = normalize(worldLightPos - v_worldCoord);
+    vec3 N = normalize(v_normal);
+
+    vec3 ambientColor = ambientFactor * color;
+    vec3 diffuseColor = color * max(0.0, dot(N, L)) * shadowFactor;
+
+    outColor = ambientColor + diffuseColor;
+    outColor = clamp(outColor, 0.0, 1.0);
 
     outNormal = v_normal;
 }

@@ -24,11 +24,7 @@ float omnishadowmapComparisonVSM(samplerCube shadowmap, vec3 worldPos, vec3 worl
     vec3 texel = texture(shadowmap, lightDirection).rgb;
     vec2 moments = texel.rg;
     float alpha = texel.b;
-    float shadowFactor = VSM(moments, dist);
-
-    float transparency = 1.0 - alpha; // range [0;1]
-    float temp = transparency * (1.0 - shadowFactor); // map to [0.0; 1.0 - shadowFactor]
-    return temp + shadowFactor; // map to [shadowFactor; 1.0]
+    return VSM(moments, dist);
 }
 
 float omnishadowmapComparison(samplerCube shadowmap, vec3 worldPos, vec3 worldLightPos)
