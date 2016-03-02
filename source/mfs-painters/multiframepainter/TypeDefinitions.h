@@ -7,7 +7,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include <globjects/base/ref_ptr.h>
+#include "Material.h"
 
 namespace globjects
 {
@@ -20,7 +20,7 @@ namespace gloperate
 }
 
 using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
-using IdTextureMap = std::map<unsigned int, globjects::ref_ptr<globjects::Texture>>;
+using IdMaterialMap = std::map<unsigned int, Material>;
 
 struct PresetInformation
 {

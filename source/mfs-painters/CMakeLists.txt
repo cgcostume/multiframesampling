@@ -10,6 +10,7 @@ find_package(glbinding REQUIRED)
 find_package(globjects REQUIRED)
 find_package(libzeug REQUIRED)
 find_package(gloperate REQUIRED)
+find_package(ASSIMP REQUIRED)
 
 
 #
@@ -51,6 +52,7 @@ set(headers
     ${include_path}/multiframepainter/OmnidirectionalShadowmap.h
     ${include_path}/multiframepainter/TransparencyMasksGenerator.h
     ${include_path}/multiframepainter/NoiseTexture.h
+    ${include_path}/multiframepainter/Material.h
     
     ${include_path}/singleframepainter/SingleFramePainter.h
 )
@@ -70,6 +72,7 @@ set(sources
     ${source_path}/multiframepainter/OmnidirectionalShadowmap.cpp
     ${source_path}/multiframepainter/TransparencyMasksGenerator.cpp
     ${source_path}/multiframepainter/NoiseTexture.cpp
+    ${source_path}/multiframepainter/Material.cpp
     
     ${source_path}/singleframepainter/SingleFramePainter.cpp
 )
@@ -128,7 +131,8 @@ target_include_directories(${target}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${GLM_INCLUDE_DIR}
-
+    ${ASSIMP_INCLUDE_DIR}
+    
     PUBLIC
 
     INTERFACE
@@ -141,6 +145,7 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
+    ${ASSIMP_LIBRARIES}
     cpplocate::cpplocate
     libzeug::iozeug
     libzeug::reflectionzeug

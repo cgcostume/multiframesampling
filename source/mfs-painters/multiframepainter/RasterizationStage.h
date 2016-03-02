@@ -38,7 +38,7 @@ public:
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
     gloperate::InputSlot<PolygonalDrawables> drawables;
-    gloperate::InputSlot<IdTextureMap> textureMap;
+    gloperate::InputSlot<IdMaterialMap> materialMap;
     gloperate::InputSlot<int> multiFrameCount;
     gloperate::InputSlot<PresetInformation> presetInformation;
 

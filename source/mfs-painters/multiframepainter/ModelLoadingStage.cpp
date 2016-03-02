@@ -1,5 +1,7 @@
 #include "ModelLoadingStage.h"
 
+#include <iostream>
+
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl/enum.h>
 
@@ -10,6 +12,12 @@
 #include <gloperate/primitives/Scene.h>
 #include <gloperate/resources/ResourceManager.h>
 #include <gloperate/base/make_unique.hpp>
+
+#include <assimp/scene.h>
+#include <assimp/cimport.h>
+#include <assimp/types.h>
+#include <assimp/postprocess.h>
+#include <assimp/material.h>
 
 using namespace gl;
 using gloperate::make_unique;
@@ -32,6 +40,27 @@ namespace
         }
         return subj;
     }
+
+    auto textureTypes = {
+        aiTextureType_DIFFUSE,
+        aiTextureType_NORMALS,
+        aiTextureType_EMISSIVE,
+        aiTextureType_SPECULAR,
+        aiTextureType_HEIGHT
+    };
+
+    TextureType translateAssimpTextureType(aiTextureType aiTexType)
+    {
+        static const std::map<aiTextureType, TextureType> conversion {
+            { aiTextureType_DIFFUSE, TextureType::Diffuse },
+            { aiTextureType_NORMALS, TextureType::Normal },
+            { aiTextureType_SPECULAR, TextureType::Specular },
+            { aiTextureType_EMISSIVE, TextureType::Emissive },
+            { aiTextureType_HEIGHT, TextureType::Bump },
+        };
+
+        return conversion.at(aiTexType);
+    }
 }
 
 ModelLoadingStage::ModelLoadingStage()
@@ -41,51 +70,96 @@ ModelLoadingStage::ModelLoadingStage()
 
     addOutput("drawables", drawables);
     addOutput("presetInformation", presetInformation);
-    addOutput("textureMap", textureMap);
+    addOutput("materialMap", materialMap);
 }
 
 void ModelLoadingStage::process()
 {
+    drawables.data() = PolygonalDrawables{};
+    materialMap.data() = IdMaterialMap{};
+
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &m_maxAnisotropy);
+
     auto modelFilename = getFilename(preset.data());
+    auto dir = getDirectory(modelFilename);
+
     presetInformation.data() = getPresetInformation(preset.data());
 
-    drawables.data() = PolygonalDrawables{};
-    textureMap.data() = IdTextureMap{};
+    const aiScene* assimpScene = nullptr;
+    aiReleaseImport(assimpScene);
+    assimpScene = aiImportFile(
+        modelFilename.c_str(),
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType |
+        aiProcess_GenNormals);
+
+    if (!assimpScene)
+        std::cout << aiGetErrorString();
+
+    for (unsigned int m = 0; m < assimpScene->mNumMaterials; m++)
+    {
+        auto mat = loadMaterial(assimpScene->mMaterials[m], dir);
+        materialMap.data()[m] = mat;
+    }
 
     auto scene = resourceManager.data()->load<gloperate::Scene>(modelFilename);
-
     for (auto mesh : scene->meshes())
     {
         drawables->push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
     }
 
-    auto dir = getDirectory(modelFilename);
-
-    GLfloat maxAnisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
-
-    for (auto& materialPair : scene->materials())
-    {
-        auto id = materialPair.first;
-        auto& filename = materialPair.second;
-        replace(filename, "\\", "/");
-
-        globjects::ref_ptr<globjects::Texture> tex = resourceManager.data()->load<globjects::Texture>(dir + "/" + filename);
-
-        if (tex)
-        {
-            textureMap.data()[id] = tex;
-            textureMap.data()[id]->setParameter(GL_TEXTURE_WRAP_R, GL_REPEAT);
-            textureMap.data()[id]->setParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
-            textureMap.data()[id]->setParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-            textureMap.data()[id]->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            textureMap.data()[id]->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            textureMap.data()[id]->setParameter(GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-            textureMap.data()[id]->generateMipmap();
-        }
-    }
+    delete assimpScene;
 
     invalidateOutputs();
+}
+
+globjects::ref_ptr<globjects::Texture> ModelLoadingStage::loadTexture(const std::string& filename, bool genMipmap) const
+{
+    globjects::ref_ptr<globjects::Texture> tex = resourceManager.data()->load<globjects::Texture>(filename);
+    tex->setParameter(GL_TEXTURE_WRAP_R, GL_REPEAT);
+    tex->setParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
+    tex->setParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if (genMipmap)
+    {
+        tex->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        tex->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        tex->setParameter(GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
+        tex->generateMipmap();
+    }
+    else
+    {
+        tex->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        tex->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+
+    return tex;
+}
+
+Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& directory) const
+{
+    Material material;
+
+    for (aiTextureType aiTexType : textureTypes)
+    {
+        auto type = translateAssimpTextureType(aiTexType);
+
+        aiString texPath;
+        aiReturn ret = aiMat->GetTexture(aiTexType, 0, &texPath, nullptr, nullptr, nullptr, nullptr, nullptr);
+        
+        if (ret != aiReturn_SUCCESS)
+            continue;
+
+        std::string texPathStd = std::string(texPath.C_Str());
+
+        bool genMipmap = type == TextureType::Diffuse;
+        auto texture = loadTexture(directory + "/" + texPathStd, genMipmap);
+
+        material.addTexture(type, texture);
+    }
+
+    return material;
 }
 
 PresetInformation ModelLoadingStage::getPresetInformation(Preset preset)

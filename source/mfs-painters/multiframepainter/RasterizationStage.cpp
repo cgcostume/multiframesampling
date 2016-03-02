@@ -20,6 +20,7 @@
 
 #include "TransparencyMasksGenerator.h"
 #include "NoiseTexture.h"
+#include "Material.h"
 
 using namespace gl;
 using gloperate::make_unique;
@@ -40,7 +41,7 @@ RasterizationStage::RasterizationStage()
     addInput("camera", camera);
     addInput("drawables", drawables);
     addInput("presetInformation", presetInformation);
-    addInput("textureMap", textureMap);
+    addInput("materialMap", materialMap);
 
     addOutput("color", color);
     addOutput("normal", normal);
@@ -168,6 +169,8 @@ void RasterizationStage::render()
         program->setUniform("masksTexture", 1);
         program->setUniform("noiseTexture", 2);
         program->setUniform("diffuseTexture", 3);
+        program->setUniform("normalMap", 4);
+        program->setUniform("bumpMap", 5);
 
         program->setUniform("worldLightPos", frameLightPosition);
 
@@ -190,16 +193,34 @@ void RasterizationStage::render()
     for (auto& drawable : drawables.data())
     {
         auto id = drawable->materialIndex();
-        if (textureMap.data().count(id) > 0)
+        auto& material = materialMap.data().at(id);
+
+        bool hasDiffuseTex = material.hasTexture(TextureType::Diffuse);
+        bool hasNormalTex = material.hasTexture(TextureType::Normal);
+        bool hasBumpTex = material.hasTexture(TextureType::Bump);
+
+        if (hasDiffuseTex)
         {
-            m_program->setUniform("useDiffuseTexture", true);
-            textureMap.data().at(id)->bindActive(3);
+            auto tex = material.textureMap().at(TextureType::Diffuse);
+            tex->bindActive(3);
         }
-        else
+
+        if (hasNormalTex)
         {
-            m_program->setUniform("useDiffuseTexture", false);
+            auto tex = material.textureMap().at(TextureType::Normal);
+            tex->bindActive(4);
         }
-        
+
+        if (hasBumpTex)
+        {
+            auto tex = material.textureMap().at(TextureType::Bump);
+            tex->bindActive(5);
+        }
+
+        m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
+        m_program->setUniform("useNormalMap", hasNormalTex);
+        m_program->setUniform("useBumpMap", hasBumpTex);
+
         drawable->draw();
     }
 
