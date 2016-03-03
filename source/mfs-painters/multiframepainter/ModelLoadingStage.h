@@ -40,7 +40,7 @@ protected:
 
     virtual void process() override;
 
-    globjects::ref_ptr<globjects::Texture> loadTexture(const std::string& filename, bool genMipmap) const;
+    globjects::ref_ptr<globjects::Texture> loadTexture(const std::string& filename) const;
     Material loadMaterial(aiMaterial* mat, const std::string& directory) const;
 
     static PresetInformation getPresetInformation(Preset preset);

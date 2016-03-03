@@ -114,25 +114,16 @@ void ModelLoadingStage::process()
     invalidateOutputs();
 }
 
-globjects::ref_ptr<globjects::Texture> ModelLoadingStage::loadTexture(const std::string& filename, bool genMipmap) const
+globjects::ref_ptr<globjects::Texture> ModelLoadingStage::loadTexture(const std::string& filename) const
 {
     globjects::ref_ptr<globjects::Texture> tex = resourceManager.data()->load<globjects::Texture>(filename);
     tex->setParameter(GL_TEXTURE_WRAP_R, GL_REPEAT);
     tex->setParameter(GL_TEXTURE_WRAP_S, GL_REPEAT);
     tex->setParameter(GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    if (genMipmap)
-    {
-        tex->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        tex->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        tex->setParameter(GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
-        tex->generateMipmap();
-    }
-    else
-    {
-        tex->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        tex->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    }
+    tex->setParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tex->setParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    tex->setParameter(GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
+    tex->generateMipmap();
 
     return tex;
 }
@@ -147,15 +138,13 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
 
         aiString texPath;
         aiReturn ret = aiMat->GetTexture(aiTexType, 0, &texPath);
-        
+
         if (ret != aiReturn_SUCCESS)
             continue;
 
         std::string texPathStd = std::string(texPath.C_Str());
 
-        //bool genMipmap = type == TextureType::Diffuse;
-        bool genMipmap = true;
-        auto texture = loadTexture(directory + "/" + texPathStd, genMipmap);
+        auto texture = loadTexture(directory + "/" + texPathStd);
 
         material.addTexture(type, texture);
     }
