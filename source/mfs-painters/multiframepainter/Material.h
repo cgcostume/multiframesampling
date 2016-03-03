@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include <glm/vec3.hpp>
+
 #include <globjects/base/ref_ptr.h>
 #include <globjects/Texture.h>
 
@@ -26,6 +28,8 @@ public:
     using TextureMap = std::map<TextureType, globjects::ref_ptr<globjects::Texture>>;
 
     Material() = default;
+
+    glm::vec3 specularColor;
 
     const TextureMap& textureMap() const;
     void addTexture(TextureType type, globjects::ref_ptr<globjects::Texture> texture);

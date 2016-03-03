@@ -38,6 +38,7 @@ namespace
         NoiseSampler,
         DiffuseSampler,
         SpecularSampler,
+        EmissiveSampler,
         BumpSampler
     };
 }
@@ -180,6 +181,7 @@ void RasterizationStage::render()
         program->setUniform("noiseTexture", NoiseSampler);
         program->setUniform("diffuseTexture", DiffuseSampler);
         program->setUniform("specularTexture", SpecularSampler);
+        program->setUniform("emissiveTexture", EmissiveSampler);
         program->setUniform("bumpTexture", BumpSampler);
 
         program->setUniform("worldLightPos", frameLightPosition);
@@ -209,6 +211,7 @@ void RasterizationStage::render()
         bool hasDiffuseTex = material.hasTexture(TextureType::Diffuse);
         bool hasBumpTex = material.hasTexture(TextureType::Bump);
         bool hasSpecularTex = material.hasTexture(TextureType::Specular);
+        bool hasEmissiveTex = material.hasTexture(TextureType::Emissive);
 
         if (hasDiffuseTex)
         {
@@ -218,10 +221,16 @@ void RasterizationStage::render()
 
         if (hasSpecularTex)
         {
-            auto tex = material.textureMap().at(TextureType::Diffuse);
+            auto tex = material.textureMap().at(TextureType::Specular);
             tex->bindActive(SpecularSampler);
         }
         
+        if (hasEmissiveTex)
+        {
+            auto tex = material.textureMap().at(TextureType::Emissive);
+            tex->bindActive(EmissiveSampler);
+        }
+
         auto bumpType = BumpType::None;
         if (hasBumpTex)
         {
@@ -233,6 +242,7 @@ void RasterizationStage::render()
         m_program->setUniform("bumpType", static_cast<int>(bumpType));
         m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
         m_program->setUniform("useSpecularTexture", hasSpecularTex);
+        m_program->setUniform("useEmissiveTexture", hasSpecularTex);
 
         drawable->draw();
     }

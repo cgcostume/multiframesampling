@@ -20,6 +20,8 @@ uniform sampler2D diffuseTexture;
 uniform bool useDiffuseTexture;
 uniform sampler2D specularTexture;
 uniform bool useSpecularTexture;
+uniform sampler2D emissiveTexture;
+uniform bool useEmissiveTexture;
 uniform sampler2D bumpTexture;
 uniform int bumpType;
 
@@ -32,7 +34,8 @@ uniform vec3 cameraEye;
 #define BUMP_NORMAL 2
 
 const float ambientFactor = 0.25;
-const float specularFactor = 0.25;
+const float specularFactor = 0.75;
+const float emissiveFactor = 0.75;
 const float shininess = 20.0;
 
 // taken from http://www.thetenthplanet.de/archives/1180
@@ -97,6 +100,12 @@ void main()
         specularColor = texture(specularTexture, uv).rgb;
     }
 
+    vec3 emissiveColor = vec3(0.0);
+    if (useEmissiveTexture)
+    {
+        emissiveColor = texture(emissiveTexture, uv).rgb;
+    }
+
     vec3 L = normalize(worldLightPos - v_worldCoord);
     vec3 V = normalize(cameraEye - v_worldCoord);
     vec3 H = normalize(L + V);
@@ -106,8 +115,9 @@ void main()
     vec3 ambientTerm = ambientFactor * diffuseColor;
     vec3 diffuseTerm = diffuseColor * max(0.0, ndotl) * shadowFactor;
     vec3 specularTerm = specularFactor * specularColor * pow(max(0.0, ndotH), shininess) * shadowFactor;
+    vec3 emissiveTerm = emissiveFactor * emissiveColor;
 
-    outColor = ambientTerm + diffuseTerm + specularTerm;
+    outColor = ambientTerm + diffuseTerm + specularTerm + emissiveTerm;
     outColor = clamp(outColor, 0.0, 1.0);
 
     outNormal = v_normal;
