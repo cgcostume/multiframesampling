@@ -121,7 +121,7 @@ int main(int argc, char * argv[])
 
     gloperate_qt::Viewer viewer;
     viewer.show();
-    viewer.loadPainter(name);
+    viewer.setPainter(*painter);
 
     return app.exec();
 }
