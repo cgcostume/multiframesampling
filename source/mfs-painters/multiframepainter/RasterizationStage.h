@@ -7,9 +7,6 @@
 #include <gloperate/pipeline/Data.h>
 
 #include "TypeDefinitions.h"
-#include "OmnidirectionalShadowmap.h"
-#include "GroundPlane.h"
-#include "NoiseTexture.h"
 
 namespace globjects
 {
@@ -26,6 +23,10 @@ namespace gloperate
 
     class PolygonalDrawable;
 }
+
+class NoiseTexture;
+class GroundPlane;
+class OmnidirectionalShadowmap;
 
 class RasterizationStage : public gloperate::AbstractStage
 {

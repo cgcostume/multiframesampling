@@ -20,6 +20,8 @@
 
 #include "TransparencyMasksGenerator.h"
 #include "NoiseTexture.h"
+#include "OmnidirectionalShadowmap.h"
+#include "GroundPlane.h"
 #include "Material.h"
 
 using namespace gl;

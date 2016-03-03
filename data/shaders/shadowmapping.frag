@@ -1,16 +1,12 @@
 #version 330
-#extension GL_ARB_shading_language_include : require
-
-#include </data/shaders/common/fragment_discard.glsl>
-#include </data/shaders/common/random.glsl>
+#extension GL_ARB_shading_language_include : required
 
 in vec3 g_worldCoord;
 
 uniform vec3 lightWorldPos;
+uniform float alpha;
 
 layout (location = 0) out vec3 out_dist;
-
-uniform float alpha;
 
 void main()
 {
