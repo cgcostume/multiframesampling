@@ -66,14 +66,14 @@ ModelLoadingStage::ModelLoadingStage()
     addInput("resouceManager", resourceManager);
     addInput("preset", preset);
 
-    addOutput("drawables", drawables);
+    addOutput("drawablesMap", drawablesMap);
     addOutput("presetInformation", presetInformation);
     addOutput("materialMap", materialMap);
 }
 
 void ModelLoadingStage::process()
 {
-    drawables.data() = PolygonalDrawables{};
+    drawablesMap.data() = IdDrawablesMap{};
     materialMap.data() = IdMaterialMap{};
 
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &m_maxAnisotropy);
@@ -99,12 +99,14 @@ void ModelLoadingStage::process()
     {
         auto mat = loadMaterial(assimpScene->mMaterials[m], dir);
         materialMap.data()[m] = mat;
+        drawablesMap.data()[m] = PolygonalDrawables{};
     }
 
     auto scene = resourceManager.data()->load<gloperate::Scene>(modelFilename);
     for (auto mesh : scene->meshes())
     {
-        drawables->push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
+        auto& drawables = drawablesMap.data()[mesh->materialIndex()];
+        drawables.push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
     }
 
     delete assimpScene;
@@ -151,7 +153,8 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
 
         std::string texPathStd = std::string(texPath.C_Str());
 
-        bool genMipmap = type == TextureType::Diffuse;
+        //bool genMipmap = type == TextureType::Diffuse;
+        bool genMipmap = true;
         auto texture = loadTexture(directory + "/" + texPathStd, genMipmap);
 
         material.addTexture(type, texture);

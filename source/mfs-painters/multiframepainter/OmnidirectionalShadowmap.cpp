@@ -114,7 +114,7 @@ void OmnidirectionalShadowmap::setupFbo(globjects::Framebuffer * fbo, globjects:
     fbo->unbind();
 }
 
-void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawables& drawables, const GroundPlane& groundPlane, float nearPlane, float farPlane) const
+void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const IdDrawablesMap& drawablesMap, const GroundPlane& groundPlane, float nearPlane, float farPlane) const
 {
     auto getTransforms = [nearPlane, farPlane](const glm::vec3 &eye, bool isCube) -> std::vector<glm::mat4>
     {
@@ -149,9 +149,13 @@ void OmnidirectionalShadowmap::render(const glm::vec3 &eye, const PolygonalDrawa
     m_shadowmapProgram->setUniform("lightWorldPos", eye);
 
     m_shadowmapProgram->use();
-    for (const auto & drawable : drawables)
+    for (const auto& pair : drawablesMap)
     {
-        drawable->draw();
+        auto& drawables = pair.second;
+        for (auto& drawable : drawables)
+        {
+            drawable->draw();
+        }
     }
 
     groundPlane.draw(m_shadowmapProgram);

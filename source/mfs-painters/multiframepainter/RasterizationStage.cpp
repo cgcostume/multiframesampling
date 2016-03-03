@@ -52,7 +52,7 @@ RasterizationStage::RasterizationStage()
     addInput("projection", projection);
     addInput("viewport", viewport);
     addInput("camera", camera);
-    addInput("drawables", drawables);
+    addInput("drawablesMap", drawablesMap);
     addInput("presetInformation", presetInformation);
     addInput("materialMap", materialMap);
 
@@ -148,7 +148,7 @@ void RasterizationStage::render()
     auto frameLightOffset = glm::circularRand(lightRadius);
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);
 
-    m_shadowmap->render(frameLightPosition, drawables.data(), *m_groundPlane.get(), presetInformation.data().nearFar.x, presetInformation.data().nearFar.y);
+    m_shadowmap->render(frameLightPosition, drawablesMap.data(), *m_groundPlane.get(), presetInformation.data().nearFar.x, presetInformation.data().nearFar.y);
 
     glViewport(viewport.data()->x(),
                viewport.data()->y(),
@@ -205,10 +205,12 @@ void RasterizationStage::render()
     m_masksTexture->bindActive(MaskSampler);
     m_noiseTexture->bindActive(NoiseSampler);
 
-    for (auto& drawable : drawables.data())
+    for (auto& pair : drawablesMap.data())
     {
-        auto id = drawable->materialIndex();
-        auto& material = materialMap.data().at(id);
+        auto materialId = pair.first;
+        auto& drawables = pair.second;
+
+        auto& material = materialMap.data().at(materialId);
 
         bool hasDiffuseTex = material.hasTexture(TextureType::Diffuse);
         bool hasBumpTex = material.hasTexture(TextureType::Bump);
@@ -246,7 +248,10 @@ void RasterizationStage::render()
         m_program->setUniform("useSpecularTexture", hasSpecularTex);
         m_program->setUniform("useEmissiveTexture", hasSpecularTex);
 
-        drawable->draw();
+        for (auto& drawable : drawables)
+        {
+            drawable->draw();
+        }
     }
 
     m_program->release();

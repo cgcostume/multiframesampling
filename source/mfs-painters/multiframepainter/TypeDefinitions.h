@@ -19,8 +19,10 @@ namespace gloperate
     class PolygonalDrawable;
 }
 
-using PolygonalDrawables = std::vector<std::unique_ptr<gloperate::PolygonalDrawable>>;
+using PolygonalDrawablePointer = std::unique_ptr<gloperate::PolygonalDrawable>;
+using PolygonalDrawables = std::vector<PolygonalDrawablePointer>;
 using IdMaterialMap = std::map<unsigned int, Material>;
+using IdDrawablesMap = std::map<unsigned int, PolygonalDrawables>;
 
 struct PresetInformation
 {

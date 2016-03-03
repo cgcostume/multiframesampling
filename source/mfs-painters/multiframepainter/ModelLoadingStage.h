@@ -32,7 +32,7 @@ public:
     gloperate::InputSlot<Preset> preset;
 
     gloperate::Data<PresetInformation> presetInformation;
-    gloperate::Data<PolygonalDrawables> drawables;
+    gloperate::Data<IdDrawablesMap> drawablesMap;
     gloperate::Data<IdMaterialMap> materialMap;
 
 protected:

@@ -1,5 +1,4 @@
 #version 330
-#extension GL_ARB_shading_language_include : required
 
 in vec3 g_worldCoord;
 
