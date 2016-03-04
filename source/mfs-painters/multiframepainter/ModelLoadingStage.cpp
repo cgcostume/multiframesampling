@@ -83,9 +83,7 @@ void ModelLoadingStage::process()
 
     presetInformation.data() = getPresetInformation(preset.data());
 
-    const aiScene* assimpScene = nullptr;
-    aiReleaseImport(assimpScene);
-    assimpScene = aiImportFile(
+    const aiScene* assimpScene = aiImportFile(
         modelFilename.c_str(),
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
@@ -101,6 +99,7 @@ void ModelLoadingStage::process()
         materialMap.data()[m] = mat;
         drawablesMap.data()[m] = PolygonalDrawables{};
     }
+    aiReleaseImport(assimpScene);
 
     auto scene = resourceManager.data()->load<gloperate::Scene>(modelFilename);
     for (auto mesh : scene->meshes())
@@ -108,8 +107,6 @@ void ModelLoadingStage::process()
         auto& drawables = drawablesMap.data()[mesh->materialIndex()];
         drawables.push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
     }
-
-    delete assimpScene;
 
     invalidateOutputs();
 }
