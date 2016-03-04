@@ -1,6 +1,7 @@
 #include "ModelLoadingStage.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl/enum.h>
@@ -131,8 +132,10 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
             continue;
 
         std::string texPathStd = std::string(texPath.C_Str());
+        auto path = directory + "/" + texPathStd;
+        std::replace(path.begin(), path.end(), '\\', '/');
 
-        auto texture = loadTexture(directory + "/" + texPathStd);
+        auto texture = loadTexture(path);
 
         material.addTexture(type, texture);
     }
