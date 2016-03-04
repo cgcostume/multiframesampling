@@ -40,12 +40,15 @@ public:
     gloperate::Data<IdMaterialMap> materialMap;
 
 protected:
+    using StringTextureMap = std::map<std::string, globjects::ref_ptr<globjects::Texture>>;
+
     float m_maxAnisotropy;
+    StringTextureMap m_textures;
 
     virtual void process() override;
 
     globjects::ref_ptr<globjects::Texture> loadTexture(const std::string& filename) const;
-    Material loadMaterial(aiMaterial* mat, const std::string& directory) const;
+    Material loadMaterial(aiMaterial* mat, const std::string& directory);
     gloperate::Scene * convertScene(const aiScene * scene) const;
     gloperate::PolygonalGeometry * convertGeometry(const aiMesh * mesh) const;
 

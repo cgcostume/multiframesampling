@@ -67,6 +67,7 @@ void ModelLoadingStage::process()
 {
     drawablesMap.data() = IdDrawablesMap{};
     materialMap.data() = IdMaterialMap{};
+    m_textures = StringTextureMap{};
 
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &m_maxAnisotropy);
 
@@ -83,7 +84,8 @@ void ModelLoadingStage::process()
         aiProcess_GenNormals |
         aiProcess_OptimizeGraph |
         aiProcess_OptimizeMeshes |
-        aiProcess_ImproveCacheLocality);
+        aiProcess_ImproveCacheLocality |
+        aiProcess_RemoveRedundantMaterials);
 
     if (!assimpScene)
         std::cout << aiGetErrorString();
@@ -121,7 +123,7 @@ globjects::ref_ptr<globjects::Texture> ModelLoadingStage::loadTexture(const std:
     return tex;
 }
 
-Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& directory) const
+Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& directory)
 {
     Material material;
 
@@ -139,7 +141,17 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
         auto path = directory + "/" + texPathStd;
         std::replace(path.begin(), path.end(), '\\', '/');
 
-        auto texture = loadTexture(path);
+        globjects::ref_ptr<globjects::Texture> texture = nullptr;
+        auto textureIt = m_textures.find(path);
+        if (textureIt != m_textures.end())
+        {
+            texture = (*textureIt).second;
+        }
+        else
+        {
+            texture = loadTexture(path);
+            m_textures[path] = texture;
+        }
 
         material.addTexture(type, texture);
     }
