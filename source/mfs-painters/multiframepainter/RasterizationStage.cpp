@@ -188,6 +188,7 @@ void RasterizationStage::render()
         program->setUniform("opacityTexture", OpacitySampler);
         program->setUniform("bumpTexture", BumpSampler);
 
+        program->setUniform("groundPlaneColor", presetInformation.data().groundColor);
         program->setUniform("worldLightPos", frameLightPosition);
 
         program->setUniform("cameraEye", camera.data()->eye());

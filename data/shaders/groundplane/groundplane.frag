@@ -5,6 +5,7 @@
 
 uniform samplerCube shadowmap;
 uniform vec3 worldLightPos;
+uniform vec3 groundPlaneColor;
 
 in vec3 g_worldCoord;
 
@@ -12,12 +13,11 @@ layout (location = 0) out vec3 outColor;
 layout (location = 1) out vec3 outNormal;
 
 const float ambientFactor = 0.25;
-const vec3 color = vec3(1.0);
 
 void main()
 {
-    outColor = color * omnishadowmapComparisonVSM(shadowmap, g_worldCoord, worldLightPos);
-    outColor += ambientFactor * color;
+    outColor = groundPlaneColor * omnishadowmapComparisonVSM(shadowmap, g_worldCoord, worldLightPos);
+    outColor += ambientFactor * groundPlaneColor;
     outColor = clamp(outColor, 0.0, 1.0);
 
     outNormal = vec3(0.0, 1.0, 0.0);

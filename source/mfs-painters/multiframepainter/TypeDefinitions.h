@@ -31,6 +31,7 @@ struct PresetInformation
     glm::vec2 nearFar;
     glm::vec3 lightPosition;
     float lightMaxShift;
+    glm::vec3 groundColor;
     float groundHeight;
     BumpType bumpType;
 };
