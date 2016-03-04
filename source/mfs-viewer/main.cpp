@@ -57,8 +57,6 @@ int main(int argc, char * argv[])
     #endif
 
     // Choose a painter
-    std::unique_ptr<gloperate::Painter> painter(nullptr);
-
     #ifdef __APPLE__
         std::string name = "MultiFramePainter";
     #else
@@ -82,7 +80,7 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    painter.reset(painterPlugin->createPainter(resourceManager));
+    gloperate::Painter* painter = painterPlugin->createPainter(resourceManager);
 
     // Create Event Provider
     /*QtKeyEventProvider * keyProvider = new QtKeyEventProvider();
