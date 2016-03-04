@@ -80,7 +80,10 @@ void ModelLoadingStage::process()
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType |
-        aiProcess_GenNormals);
+        aiProcess_GenNormals |
+        aiProcess_OptimizeGraph |
+        aiProcess_OptimizeMeshes |
+        aiProcess_ImproveCacheLocality);
 
     if (!assimpScene)
         std::cout << aiGetErrorString();
@@ -91,14 +94,15 @@ void ModelLoadingStage::process()
         materialMap.data()[m] = mat;
         drawablesMap.data()[m] = PolygonalDrawables{};
     }
-    aiReleaseImport(assimpScene);
 
-    auto scene = resourceManager.data()->load<gloperate::Scene>(modelFilename);
+    auto scene = convertScene(assimpScene);
     for (auto mesh : scene->meshes())
     {
         auto& drawables = drawablesMap.data()[mesh->materialIndex()];
         drawables.push_back(make_unique<gloperate::PolygonalDrawable>(*mesh));
     }
+
+    aiReleaseImport(assimpScene);
 
     invalidateOutputs();
 }
@@ -172,4 +176,76 @@ std::string ModelLoadingStage::getFilename(Preset preset)
     };
 
     return conversion.at(preset);
+}
+
+gloperate::Scene * ModelLoadingStage::convertScene(const aiScene * scene) const
+{
+    // Create new scene
+    gloperate::Scene * sceneOut = new gloperate::Scene;
+
+    // Convert meshes from the scene
+    for (size_t i = 0; i < scene->mNumMeshes; ++i)
+    {
+        sceneOut->meshes().push_back(convertGeometry(scene->mMeshes[i]));
+    }
+
+    // Return scene
+    return sceneOut;
+}
+
+gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh * mesh) const
+{
+    // Create geometry
+    gloperate::PolygonalGeometry * geometry = new gloperate::PolygonalGeometry;
+
+    // Copy index array
+    std::vector<unsigned int> indices;
+    for (size_t i = 0; i < mesh->mNumFaces; ++i)
+    {
+        const auto & face = mesh->mFaces[i];
+        for (auto j = 0u; j < face.mNumIndices; ++j)
+            indices.push_back(face.mIndices[j]);
+    }
+    geometry->setIndices(std::move(indices));
+
+    // Copy vertex array
+    std::vector<glm::vec3> vertices;
+    for (size_t i = 0; i < mesh->mNumVertices; ++i)
+    {
+        const auto & vertex = mesh->mVertices[i];
+        vertices.push_back({ vertex.x, vertex.y, vertex.z });
+    }
+    geometry->setVertices(std::move(vertices));
+
+    // Does the mesh contain normal vectors?
+    if (mesh->HasNormals())
+    {
+        // Copy normal array
+        std::vector<glm::vec3> normals;
+        for (size_t i = 0; i < mesh->mNumVertices; ++i)
+        {
+            const auto & normal = mesh->mNormals[i];
+            normals.push_back({ normal.x, normal.y, normal.z });
+        }
+        geometry->setNormals(std::move(normals));
+    }
+
+    // Does the mesh contain texture coordinates?
+    if (mesh->HasTextureCoords(0))
+    {
+        // Copy texture cooridinate array
+        std::vector<glm::vec3> textureCoordinates;
+        for (size_t i = 0; i < mesh->mNumVertices; ++i)
+        {
+            const auto & textureCoordinate = mesh->mTextureCoords[0][i];
+            textureCoordinates.push_back({ textureCoordinate.x, textureCoordinate.y, textureCoordinate.z });
+        }
+        geometry->setTextureCoordinates(std::move(textureCoordinates));
+    }
+
+    // Materials
+    geometry->setMaterialIndex(mesh->mMaterialIndex);
+
+    // Return geometry
+    return geometry;
 }

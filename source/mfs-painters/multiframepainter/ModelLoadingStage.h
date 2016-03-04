@@ -17,10 +17,14 @@ namespace globjects
 
 namespace gloperate
 {
+    class PolygonalGeometry;
     class PolygonalDrawable;
     class ResourceManager;
+    class Scene;
 }
 
+class aiMesh;
+class aiScene;
 class aiMaterial;
 
 class ModelLoadingStage : public gloperate::AbstractStage
@@ -42,6 +46,8 @@ protected:
 
     globjects::ref_ptr<globjects::Texture> loadTexture(const std::string& filename) const;
     Material loadMaterial(aiMaterial* mat, const std::string& directory) const;
+    gloperate::Scene * convertScene(const aiScene * scene) const;
+    gloperate::PolygonalGeometry * convertGeometry(const aiMesh * mesh) const;
 
     static PresetInformation getPresetInformation(Preset preset);
     static std::string getFilename(Preset preset);
