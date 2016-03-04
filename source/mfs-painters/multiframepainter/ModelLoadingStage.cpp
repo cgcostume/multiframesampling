@@ -30,22 +30,12 @@ namespace
         return(path.substr(0, found));
     }
 
-    std::string & replace(std::string & subj, std::string old, std::string neu)
-    {
-        size_t uiui = subj.find(old);
-        if (uiui != std::string::npos)
-        {
-            subj.erase(uiui, old.size());
-            subj.insert(uiui, neu);
-        }
-        return subj;
-    }
-
     auto textureTypes = {
         aiTextureType_DIFFUSE,
         aiTextureType_EMISSIVE,
         aiTextureType_SPECULAR,
-        aiTextureType_HEIGHT
+        aiTextureType_HEIGHT,
+        aiTextureType_OPACITY
     };
 
     TextureType translateAssimpTextureType(aiTextureType aiTexType)
@@ -55,6 +45,7 @@ namespace
             { aiTextureType_SPECULAR, TextureType::Specular },
             { aiTextureType_EMISSIVE, TextureType::Emissive },
             { aiTextureType_HEIGHT, TextureType::Bump },
+            { aiTextureType_OPACITY, TextureType::Opacity }
         };
 
         return conversion.at(aiTexType);

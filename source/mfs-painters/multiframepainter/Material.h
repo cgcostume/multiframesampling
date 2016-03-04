@@ -12,7 +12,8 @@ enum class TextureType
     Diffuse,
     Specular,
     Emissive,
-    Bump
+    Bump,
+    Opacity
 };
 
 enum class BumpType

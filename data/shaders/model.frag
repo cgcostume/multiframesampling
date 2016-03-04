@@ -22,6 +22,8 @@ uniform sampler2D specularTexture;
 uniform bool useSpecularTexture;
 uniform sampler2D emissiveTexture;
 uniform bool useEmissiveTexture;
+uniform sampler2D opacityTexture;
+uniform bool useOpacityTexture;
 uniform sampler2D bumpTexture;
 uniform int bumpType;
 
@@ -60,12 +62,19 @@ mat3 cotangent_frame(vec3 N, vec3 p, vec2 uv)
 
 void main()
 {
-    if (fragmentDiscard(alpha, 0, masksTexture, rand(noiseTexture, v_worldCoord, masksOffset)))
+    vec2 uv = v_uv.xy;
+
+    float curAlpha = alpha;
+    if (useOpacityTexture)
+    {
+        curAlpha = texture(opacityTexture, uv).r;
+    }
+
+    if (fragmentDiscard(curAlpha, 0, masksTexture, rand(noiseTexture, v_worldCoord, masksOffset)))
     {
         discard;
     }
 
-    vec2 uv = v_uv.xy;
     vec3 N = normalize(v_normal);
     mat3 tbn = cotangent_frame(N, v_worldCoord, uv);
 
