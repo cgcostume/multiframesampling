@@ -2,7 +2,10 @@
 
 #include <glbinding/gl/enum.h>
 
-#include <glm/vec3.hpp>
+#include <glkernel/Kernel.h>
+#include <glkernel/sample.h>
+#include <glkernel/scale.h>
+
 #include <glm/gtc/random.hpp>
 
 #include <globjects/Texture.h>
@@ -19,38 +22,6 @@ using namespace gl;
 
 namespace
 {
-    std::vector<glm::vec3> ssaoKernel(unsigned int size)
-    {
-        static const auto minDistance = 0.1f;
-        const auto inverseSize = 1.f / static_cast<float>(size);
-
-        auto kernel = std::vector<glm::vec3>();
-
-        if (size == 1)
-        {
-            kernel.push_back(glm::vec3(0.f));
-
-            return kernel;
-        }
-
-        while (kernel.size() < size)
-        {
-            auto v = glm::sphericalRand(1.f);
-            v.z = glm::abs(v.z);
-            if (v.z < 0.1)
-                continue;
-
-            auto scale = static_cast<float>(kernel.size()) * inverseSize;
-            scale = scale * scale * (1.f - minDistance) + minDistance;
-
-            v *= scale;
-
-            kernel.push_back(v);
-        }
-
-        return kernel;
-    }
-
     std::vector<glm::vec3> ssaoNoise(const unsigned int size)
     {
         auto kernel = std::vector<glm::vec3>();
@@ -71,12 +42,20 @@ namespace
 
     globjects::Texture* ssaoKernelTexture(unsigned int size)
     {
+        auto kernel = glkernel::kernel3{static_cast<uint16_t>(size)};
+        glkernel::sample::best_candidate(kernel);
+        glkernel::scale::range(kernel, -1.0f, 1.0f);
+        for (auto& elem : kernel)
+        {
+            elem.z = glm::abs(elem.z);
+        }
+
         auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
         texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
         texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
         texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
 
-        texture->image1D(0, gl::GL_RGBA32F, size, 0, gl::GL_RGB, gl::GL_FLOAT, ssaoKernel(size).data());
+        texture->image1D(0, gl::GL_RGBA32F, size, 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
 
         return texture;
     }
