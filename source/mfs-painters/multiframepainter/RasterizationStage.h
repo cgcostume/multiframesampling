@@ -69,4 +69,5 @@ protected:
     std::unique_ptr<NoiseTexture> m_noiseTexture;
 
     glkernel::kernel2 m_aaSamples;
+    glkernel::kernel2 m_dofSamples;
 };

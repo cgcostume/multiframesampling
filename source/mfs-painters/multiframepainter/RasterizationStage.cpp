@@ -20,6 +20,7 @@
 
 #include <glkernel/sample.h>
 #include <glkernel/scale.h>
+#include <glkernel/sort.h>
 #include <glkernel/shuffle.h>
 
 #include "TransparencyMasksGenerator.h"
@@ -72,6 +73,11 @@ void RasterizationStage::initialize()
     glkernel::sample::poisson_square(m_aaSamples);
     glkernel::scale::range(m_aaSamples, -.5f, .5f);
     glkernel::shuffle::random(m_aaSamples, 1);
+
+    m_dofSamples = {multiFrameCount.data()};
+    glkernel::sample::poisson_square(m_dofSamples);
+    glkernel::scale::range(m_dofSamples, -1.f, 1.f);
+    glkernel::sort::distance(m_dofSamples, {0.f, 0.f});
 
     setupGLState();
     setupMasksTexture();
@@ -177,11 +183,9 @@ void RasterizationStage::render()
 
     m_program->use();
 
-    // TODO: use glkernel
-    auto range = 0.5f;
     auto subpixelSample = m_aaSamples[currentFrame.data() - 1];
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
-    auto focalPoint = glm::diskRand(focalPointRadius);
+    auto focalPoint = m_dofSamples[currentFrame.data() - 1] * focalPointRadius;
 
     for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
     {
