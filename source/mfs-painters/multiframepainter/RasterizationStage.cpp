@@ -69,15 +69,20 @@ RasterizationStage::RasterizationStage()
 
 void RasterizationStage::initialize()
 {
-    m_aaSamples = {multiFrameCount.data()};
+    m_aaSamples = {static_cast<uint16_t>(multiFrameCount.data())};
     glkernel::sample::poisson_square(m_aaSamples);
     glkernel::scale::range(m_aaSamples, -.5f, .5f);
     glkernel::shuffle::random(m_aaSamples, 1);
 
-    m_dofSamples = {multiFrameCount.data()};
+    m_dofSamples = {static_cast<uint16_t>(multiFrameCount.data())};
     glkernel::sample::poisson_square(m_dofSamples);
     glkernel::scale::range(m_dofSamples, -1.f, 1.f);
     glkernel::sort::distance(m_dofSamples, {0.f, 0.f});
+
+    m_shadowSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
+    glkernel::sample::poisson_square(m_shadowSamples);
+    glkernel::scale::range(m_shadowSamples, -1.f, 1.f);
+    glkernel::sort::distance(m_shadowSamples, { 0.f, 0.f });
 
     setupGLState();
     setupMasksTexture();
@@ -161,7 +166,7 @@ void RasterizationStage::render()
     auto lightPosition = presetInformation.data().lightPosition;
     auto lightRadius = presetInformation.data().lightMaxShift;
 
-    auto frameLightOffset = glm::circularRand(lightRadius);
+    auto frameLightOffset = m_shadowSamples[currentFrame.data() - 1] * lightRadius;
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);
 
     m_shadowmap->render(frameLightPosition, drawablesMap.data(), *m_groundPlane.get(), presetInformation.data().nearFar.x, presetInformation.data().nearFar.y);

@@ -70,4 +70,5 @@ protected:
 
     glkernel::kernel2 m_aaSamples;
     glkernel::kernel2 m_dofSamples;
+    glkernel::kernel2 m_shadowSamples;
 };
