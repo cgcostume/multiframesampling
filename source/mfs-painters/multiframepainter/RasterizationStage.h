@@ -6,6 +6,8 @@
 #include <gloperate/pipeline/InputSlot.h>
 #include <gloperate/pipeline/Data.h>
 
+#include <glkernel/Kernel.h>
+
 #include "TypeDefinitions.h"
 
 namespace globjects
@@ -65,4 +67,6 @@ protected:
 
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     std::unique_ptr<NoiseTexture> m_noiseTexture;
+
+    glkernel::kernel2 m_aaSamples;
 };

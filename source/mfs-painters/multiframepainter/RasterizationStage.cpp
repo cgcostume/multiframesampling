@@ -18,6 +18,10 @@
 
 #include <gloperate/primitives/PolygonalDrawable.h>
 
+#include <glkernel/sample.h>
+#include <glkernel/scale.h>
+#include <glkernel/shuffle.h>
+
 #include "TransparencyMasksGenerator.h"
 #include "NoiseTexture.h"
 #include "OmnidirectionalShadowmap.h"
@@ -64,12 +68,17 @@ RasterizationStage::RasterizationStage()
 
 void RasterizationStage::initialize()
 {
+    m_aaSamples = {multiFrameCount.data()};
+    glkernel::sample::poisson_square(m_aaSamples);
+    glkernel::scale::range(m_aaSamples, -.5f, .5f);
+    glkernel::shuffle::random(m_aaSamples, 1);
+
     setupGLState();
     setupMasksTexture();
 
     m_noiseTexture = make_unique<NoiseTexture>(3u, 3u);
     m_shadowmap = make_unique<OmnidirectionalShadowmap>();
-    
+
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     depth.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
@@ -122,7 +131,7 @@ void RasterizationStage::process()
 
         m_groundPlane = make_unique<GroundPlane>(presetInformation.data().groundHeight);
     }
-    
+
     render();
 
     invalidateOutputs();
@@ -170,10 +179,7 @@ void RasterizationStage::render()
 
     // TODO: use glkernel
     auto range = 0.5f;
-    auto subpixelSample = glm::vec2(
-        glm::linearRand(-range, range),
-        glm::linearRand(-range, range)
-    );
+    auto subpixelSample = m_aaSamples[currentFrame.data() - 1];
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
     auto focalPoint = glm::diskRand(focalPointRadius);
 
@@ -203,7 +209,7 @@ void RasterizationStage::render()
         program->setUniform("cocPoint", focalPoint);
         program->setUniform("focalDist", focalDist);
     }
-    
+
     m_shadowmap->distanceTexture()->bindActive(ShadowSampler);
     m_masksTexture->bindActive(MaskSampler);
     m_noiseTexture->bindActive(NoiseSampler);
@@ -232,7 +238,7 @@ void RasterizationStage::render()
             auto tex = material.textureMap().at(TextureType::Specular);
             tex->bindActive(SpecularSampler);
         }
-        
+
         if (hasEmissiveTex)
         {
             auto tex = material.textureMap().at(TextureType::Emissive);
@@ -252,7 +258,7 @@ void RasterizationStage::render()
             auto tex = material.textureMap().at(TextureType::Bump);
             tex->bindActive(BumpSampler);
         }
-        
+
         m_program->setUniform("bumpType", static_cast<int>(bumpType));
         m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
         m_program->setUniform("useSpecularTexture", hasSpecularTex);
