@@ -11,6 +11,8 @@ in vec3 v_uv;
 
 layout(location = 0) out vec3 outColor;
 layout(location = 1) out vec3 outNormal;
+layout(location = 2) out vec3 outWorldPos;
+layout(location = 3) out float reflects;
 
 uniform samplerCube shadowmap;
 uniform sampler2D masksTexture;
@@ -130,4 +132,6 @@ void main()
     outColor = clamp(outColor, 0.0, 1.0);
 
     outNormal = v_normal;
+    outWorldPos = v_worldCoord;
+    reflects = 0.0;
 }

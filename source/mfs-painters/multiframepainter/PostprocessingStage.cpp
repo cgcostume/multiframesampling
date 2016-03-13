@@ -121,19 +121,27 @@ void PostprocessingStage::process()
     depth.data()->bindActive(2);
     m_ssaoKernelTexture->bindActive(3);
     m_ssaoNoiseTexture->bindActive(4);
+    worldPos.data()->bindActive(5);
+    reflectMask.data()->bindActive(6);
 
     m_screenAlignedQuad->program()->setUniform("colorSampler", 0);
     m_screenAlignedQuad->program()->setUniform("normalSampler", 1);
     m_screenAlignedQuad->program()->setUniform("depthSampler", 2);
     m_screenAlignedQuad->program()->setUniform("ssaoKernelSampler", 3);
     m_screenAlignedQuad->program()->setUniform("ssaoNoiseSampler", 4);
+    m_screenAlignedQuad->program()->setUniform("worldPosSampler", 5);
+    m_screenAlignedQuad->program()->setUniform("reflectSampler", 6);
 
     m_screenAlignedQuad->program()->setUniform("projectionMatrix", projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("projectionInverseMatrix", projection.data()->projectionInverted());
     m_screenAlignedQuad->program()->setUniform("normalMatrix", camera.data()->normal());
+    m_screenAlignedQuad->program()->setUniform("mvp", camera.data()->view() * projection.data()->projection());
+    m_screenAlignedQuad->program()->setUniform("view", camera.data()->view());
+    m_screenAlignedQuad->program()->setUniform("proj", projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("farZ", projection.data()->zFar());
     m_screenAlignedQuad->program()->setUniform("screenSize", screenSize);
     m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(kernelSize, 1.f / kernelSize, noiseSize, 1.f / noiseSize));
+    m_screenAlignedQuad->program()->setUniform("cameraEye", camera.data()->eye());
 
     m_screenAlignedQuad->draw();
 

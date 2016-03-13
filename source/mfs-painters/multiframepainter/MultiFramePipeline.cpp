@@ -36,6 +36,8 @@ MultiFramePipeline::MultiFramePipeline()
     postprocessingStage->color = rasterizationStage->color;
     postprocessingStage->normal = rasterizationStage->normal;
     postprocessingStage->depth = rasterizationStage->depth;
+    postprocessingStage->worldPos = rasterizationStage->worldPos;
+    postprocessingStage->reflectMask = rasterizationStage->reflectMask;
 
     frameAccumulationStage->viewport = viewport;
     frameAccumulationStage->currentFrame = rasterizationStage->currentFrame;

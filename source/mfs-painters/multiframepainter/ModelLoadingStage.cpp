@@ -163,7 +163,7 @@ PresetInformation ModelLoadingStage::getPresetInformation(Preset preset)
 {
     static const std::map<Preset, PresetInformation> conversion {
         //                          camera eye              camera center          near;far         light position          light radius   ground color   ground height  bump mapping type
-        { Preset::Imrod,          { { -10.0, 31.2, 10.65 }, { 30, 5.5, -30.0 },    { 0.3, 500.0 },  { 0, 52, 0 },           1.0f,          { 0, 0, 0 },   0.0f,          BumpType::Normal } },
+        { Preset::Imrod,          { { -10.0, 31.2, 10.65 }, { 30, 5.5, -30.0 },    { 0.3, 500.0 },  { 0, 52, 0 },           1.0f,          { 1, 1, 1 },   0.0f,          BumpType::Normal } },
         { Preset::CrytekSponza,   { { -1300, 250, -23 },    { 0.9, -1.9, -2.1 },   { 5.0, 5000.0 }, { 450, 270, -30 },      15.0f,         { 1, 1, 1 },  -10.0f,         BumpType::Height } },
         { Preset::DabrovicSponza, { { -10.0, 12.6, 0.9 },   { 3.2, 0.28, -1.82 },  { 0.3, 50.0 },   { 0, 18, 0 },           1.0f,          { 1, 1, 1 },   0.0f,          BumpType::Height } },
         { Preset::Jakobi,         { { 0.39, 0.49, -0.63 },  { 0.05, -0.04, -0.1 }, { 0.01, 8.0 },   { -0.4, 1.2, -0.7 },    0.05f,         { 1, 1, 1 },  -0.115f,        BumpType::None } },

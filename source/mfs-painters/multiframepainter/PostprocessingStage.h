@@ -35,6 +35,8 @@ public:
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> normal;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> depth;
+    gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> worldPos;
+    gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> reflectMask;
 
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> postprocessedFrame;
 

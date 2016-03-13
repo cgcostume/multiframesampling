@@ -92,11 +92,15 @@ void RasterizationStage::initialize()
 
     color.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     normal.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
+    worldPos.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
+    reflectMask.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
     depth.data() = globjects::Texture::createDefault(GL_TEXTURE_2D);
 
     m_fbo = new globjects::Framebuffer();
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, color.data());
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT1, normal.data());
+    m_fbo->attachTexture(GL_COLOR_ATTACHMENT2, worldPos.data());
+    m_fbo->attachTexture(GL_COLOR_ATTACHMENT3, reflectMask.data());
     m_fbo->attachTexture(GL_DEPTH_ATTACHMENT, depth.data());
 
     camera.data()->setEye({ 1.0575, 0.7301, -1.59997 });
@@ -152,7 +156,13 @@ void RasterizationStage::resizeTextures(int width, int height)
 {
     color.data()->image2D(0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     normal.data()->image2D(0, GL_RGBA32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    worldPos.data()->image2D(0, GL_RGBA32F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    reflectMask.data()->image2D(0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
     depth.data()->image2D(0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    
+    worldPos.data()->setParameter(GLenum::GL_TEXTURE_MAG_FILTER, GLenum::GL_NEAREST);
+    worldPos.data()->setParameter(GLenum::GL_TEXTURE_MIN_FILTER, GLenum::GL_NEAREST);
+
     m_fbo->printStatus(true);
 }
 
@@ -179,11 +189,17 @@ void RasterizationStage::render()
     m_fbo->bind();
     m_fbo->setDrawBuffers({
         GL_COLOR_ATTACHMENT0,
-        GL_COLOR_ATTACHMENT1
+        GL_COLOR_ATTACHMENT1,
+        GL_COLOR_ATTACHMENT2,
+        GL_COLOR_ATTACHMENT3
     });
+
+    auto maxFloat = std::numeric_limits<float>::max();
 
     m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(0.0f));
     m_fbo->clearBuffer(GL_COLOR, 1, glm::vec4(0.0f));
+    m_fbo->clearBuffer(GL_COLOR, 2, glm::vec4(maxFloat));
+    m_fbo->clearBuffer(GL_COLOR, 3, glm::vec4(0.0f));
     m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0.0f);
 
     m_program->use();
