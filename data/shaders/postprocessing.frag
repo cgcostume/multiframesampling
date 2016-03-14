@@ -35,29 +35,46 @@ vec3 cameraToNDC(vec3 pos)
     return pos4.xyz / pos4.w;
 }
 
+vec3 NDCToCamera(vec3 pos)
+{
+    vec4 pos4 = projectionInverseMatrix * vec4(pos, 1.0);
+    return pos4.xyz / pos4.w;
+}
+
 bool equalsDelta(float v1, float v2, float d)
 {
     return v1 > v2 - d && v1 < v2 + d;
 }
 
-bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThickness, float stepSize, const float maxSteps, float backSteps, out vec2 hitPixel, out float strength)
+bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThickness, float pixelPerStep, const float maxSteps, const float maxDist, out vec2 hitPixel, out float strength)
 {
     hitPixel = vec2(-1.0);
-    vec3 curCSPoint = csOrig;
-    for (float i = 1.0; i <= maxSteps; i += 1.0)
+    vec3 ndc1 = cameraToNDC(csOrig);
+    vec3 ndc2 = cameraToNDC(csOrig + csDir * maxDist);
+    vec3 deltaNDC = ndc2 - ndc1;
+    vec2 deltaScreen = ndc2.xy - ndc1.xy;
+
+    // calculate size of step for initial search
+    vec2 pixelStep = (1.0 / textureSize(csBuffer, 0)) * 2;
+    float steps = length(deltaScreen) / length(pixelStep);
+    steps /= pixelPerStep;
+    float stepSize = length(deltaNDC) / steps;
+
+    vec3 curNDC = ndc1;
+    vec3 lastNDC = curNDC;
+    for (float i = 1.0; i <= steps; i += 1.0)
     {
-        curCSPoint += csDir * stepSize;
-        vec3 curNDCPoint = cameraToNDC(curCSPoint);
-        if (any(greaterThanEqual(curNDCPoint.xy, vec2(1.0))) || any(lessThanEqual(curNDCPoint.xy, vec2(-1.0))))
-        {
-            return false;
-        }
-        if (curNDCPoint.z <= 0.0 || curNDCPoint.z >= 1.0)
+        if (i > maxSteps)
+            break;
+
+        curNDC += deltaNDC * stepSize;
+        if (any(greaterThanEqual(curNDC.xy, vec2(1.0))) || any(lessThanEqual(curNDC.xy, vec2(-1.0))))
         {
             return false;
         }
 
-        vec2 texCoord = curNDCPoint.xy * 0.5 + 0.5;
+        float depth = NDCToCamera(curNDC).z;
+        vec2 texCoord = curNDC.xy * 0.5 + 0.5;
 
         vec3 worldPos = texture(csBuffer, texCoord).rgb;
         if (all(greaterThan(worldPos, vec3(100000.0))))
@@ -66,38 +83,58 @@ bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThi
         }
         vec3 comp = worldToCamera(worldPos);
 
-        if (curCSPoint.z < comp.z - zThickness)
+        if (depth < comp.z - zThickness)
         {
             return false;
         }
 
-        if (curCSPoint.z < comp.z)
+        if (depth < comp.z)
         {
-            hitPixel = texCoord;
             strength = 1.0 / i;
-            vec2 lastHitPixel = hitPixel;
-            float backStepSize = stepSize / backSteps;
-            for (float j = 0.0; j < backSteps; j += 1.0)
-            {
-                curCSPoint -= csDir * backStepSize;
-                curNDCPoint = cameraToNDC(curCSPoint);
-                texCoord = curNDCPoint.xy * 0.5 + 0.5;
-                worldPos = texture(csBuffer, texCoord).rgb;
-                vec3 backComp = worldToCamera(worldPos);
+            vec3 delta = lastNDC - curNDC;
+            float minDist = 0.0;
+            float maxDist = 1.0;
+            int count = 0;
 
-                if (curCSPoint.z >= backComp.z && equalsDelta(backComp.z, comp.z, stepSize))
+            while (minDist < maxDist)
+            {
+                if (count++ > 10)
+                    break;
+
+                float curDist = minDist + 0.5 * (maxDist - minDist);
+                vec3 curPoint = curNDC + curDist * delta;
+
+                float depth = NDCToCamera(curPoint).z;
+                vec2 texCoord = curPoint.xy * 0.5 + 0.5;
+
+                vec3 worldPos = texture(csBuffer, texCoord).rgb;
+                if (all(greaterThan(worldPos, vec3(100000.0))))
                 {
-                    hitPixel = lastHitPixel;
+                    continue;
+                }
+                vec3 comp = worldToCamera(worldPos);
+
+                if (equalsDelta(depth, comp.z, maxDist / 50.0))
+                {
+                    hitPixel = texCoord;
                     return true;
                 }
-                else if (curCSPoint.z >= backComp.z)
-                    return true;
 
-                lastHitPixel = texCoord;
+                if (depth < comp.z)
+                {
+                    minDist = curDist;
+                }
+                else
+                {
+                    maxDist = curDist;
+                }
             }
 
+            hitPixel = texCoord;
             return true;
         }
+
+        lastNDC = curNDC;
     }
     return false;
 }
@@ -180,14 +217,14 @@ void main()
     vec3 csPoint = worldToCamera(worldPos);
     vec3 csDir = normalize(normalMatrix * reflectDir);
 
-    float maxSteps = 100.0;
-    float backSteps = 15.0;
-    float stepSize = farZ / 500;
+    float maxSteps = 75.0;
+    float pixelPerStep = 5.0;
     float zThickness = farZ / 160;
+    float maxDist = farZ / 4;
 
     vec2 hitPixel;
     float strength;
-    bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, stepSize, maxSteps, backSteps, hitPixel, strength);
+    bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, pixelPerStep, maxSteps, maxDist, hitPixel, strength);
 
     float reflectFactor = 1.0 - dot(normal, reflectDir);
     bool reflects = bool(texture(reflectSampler, v_uv).r);
