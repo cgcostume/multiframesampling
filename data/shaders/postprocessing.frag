@@ -85,7 +85,7 @@ bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThi
 
         if (depth < comp.z - zThickness)
         {
-            return false;
+            continue;
         }
 
         if (depth < comp.z)
