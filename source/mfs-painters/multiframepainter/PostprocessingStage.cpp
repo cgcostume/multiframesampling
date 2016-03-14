@@ -135,9 +135,7 @@ void PostprocessingStage::process()
     m_screenAlignedQuad->program()->setUniform("projectionMatrix", projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("projectionInverseMatrix", projection.data()->projectionInverted());
     m_screenAlignedQuad->program()->setUniform("normalMatrix", camera.data()->normal());
-    m_screenAlignedQuad->program()->setUniform("mvp", camera.data()->view() * projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("view", camera.data()->view());
-    m_screenAlignedQuad->program()->setUniform("proj", projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("farZ", projection.data()->zFar());
     m_screenAlignedQuad->program()->setUniform("screenSize", screenSize);
     m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(kernelSize, 1.f / kernelSize, noiseSize, 1.f / noiseSize));

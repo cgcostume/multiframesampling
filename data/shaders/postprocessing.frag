@@ -15,8 +15,6 @@ uniform sampler2D reflectSampler;
 uniform mat3 normalMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 projectionInverseMatrix;
-uniform mat4 mvp;
-uniform mat4 proj;
 uniform mat4 view;
 uniform float farZ;
 uniform vec2 screenSize;
@@ -33,7 +31,7 @@ vec3 worldToCamera(vec3 pos)
 
 vec3 cameraToNDC(vec3 pos)
 {
-    vec4 pos4 = proj * vec4(pos, 1.0);
+    vec4 pos4 = projectionMatrix * vec4(pos, 1.0);
     return pos4.xyz / pos4.w;
 }
 
