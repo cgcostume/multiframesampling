@@ -28,7 +28,7 @@ const float radius = 1.0;
 vec3 worldToCamera(vec3 pos)
 {
     vec4 pos4 = view * vec4(pos, 1.0);
-    return pos4.xyz /= pos4.w;
+    return pos4.xyz / pos4.w;
 }
 
 vec3 cameraToNDC(vec3 pos)
@@ -37,7 +37,12 @@ vec3 cameraToNDC(vec3 pos)
     return pos4.xyz / pos4.w;
 }
 
-bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThickness, float stepSize, const float maxSteps, out vec2 hitPixel, out float strength)
+bool equalsDelta(float v1, float v2, float d)
+{
+    return v1 > v2 - d && v1 < v2 + d;
+}
+
+bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThickness, float stepSize, const float maxSteps, float backSteps, out vec2 hitPixel, out float strength)
 {
     hitPixel = vec2(-1.0);
     vec3 curCSPoint = csOrig;
@@ -72,6 +77,27 @@ bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThi
         {
             hitPixel = texCoord;
             strength = 1.0 / i;
+            vec2 lastHitPixel = hitPixel;
+            float backStepSize = stepSize / backSteps;
+            for (float j = 0.0; j < backSteps; j += 1.0)
+            {
+                curCSPoint -= csDir * backStepSize;
+                curNDCPoint = cameraToNDC(curCSPoint);
+                texCoord = curNDCPoint.xy * 0.5 + 0.5;
+                worldPos = texture(csBuffer, texCoord).rgb;
+                vec3 backComp = worldToCamera(worldPos);
+
+                if (curCSPoint.z >= backComp.z && equalsDelta(backComp.z, comp.z, stepSize))
+                {
+                    hitPixel = lastHitPixel;
+                    return true;
+                }
+                else if (curCSPoint.z >= backComp.z)
+                    return true;
+
+                lastHitPixel = texCoord;
+            }
+
             return true;
         }
     }
@@ -101,6 +127,7 @@ mat3 noised(const in vec3 normal, in vec2 uv)
 void main()
 {
     float d = linearDepth(v_uv);
+    vec3 normal = normalize(texture(normalSampler, v_uv, 0).xyz);
 
     if (d > farZ)
         outColor = texture(colorSampler, v_uv).rgb;
@@ -112,7 +139,7 @@ void main()
 
     vec3 origin = eye.xyz * d;
 
-    vec3 screenspaceNormal = normalMatrix * texture(normalSampler, v_uv, 0).xyz;
+    vec3 screenspaceNormal = normalMatrix * normal;
 
     // randomized orientation matrix for hemisphere based on face normal
     mat3 m = noised(screenspaceNormal, v_uv);
@@ -142,33 +169,34 @@ void main()
 
     outColor = texture(colorSampler, v_uv).rgb * vec3(ssao);
 
-    vec3 normal = normalize(texture(normalSampler, v_uv).rgb);
     vec3 worldPos = texture(worldPosSampler, v_uv).rgb;
     vec3 worldViewDir = normalize(worldPos - cameraEye);
 
     vec3 random = texture(ssaoKernelSampler, 0).xyz;
     random.z *= -1.0 * float(texture(ssaoKernelSampler, 1).x > 0.0);
 
-    normal += random * 0.02;
-    normal = normalize(normal);
-    vec3 reflectDir = reflect(worldViewDir, normal);
+    vec3 reflectionNormal = normal + random * 0.02;
+    reflectionNormal = normalize(reflectionNormal);
+    vec3 reflectDir = reflect(worldViewDir, reflectionNormal);
 
     vec3 csPoint = worldToCamera(worldPos);
     vec3 csDir = normalize(normalMatrix * reflectDir);
 
     float maxSteps = 100.0;
-    float stepSize = farZ / 1000;
+    float backSteps = 15.0;
+    float stepSize = farZ / 500;
     float zThickness = farZ / 160;
 
     vec2 hitPixel;
     float strength;
-    bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, stepSize, maxSteps, hitPixel, strength);
+    bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, stepSize, maxSteps, backSteps, hitPixel, strength);
 
+    float reflectFactor = 1.0 - dot(normal, reflectDir);
     bool reflects = bool(texture(reflectSampler, v_uv).r);
 
     if (hit && reflects)
     {
         float f = clamp(strength * 10.0, 0.0, 1.0);
-        outColor = mix(outColor, texture(colorSampler, hitPixel).rgb, f);
+        outColor = mix(outColor, texture(colorSampler, hitPixel).rgb, f * reflectFactor);
     }
 }
