@@ -131,8 +131,15 @@ Material ModelLoadingStage::loadMaterial(aiMaterial* aiMat, const std::string& d
     {
         auto type = translateAssimpTextureType(aiTexType);
 
+        float specularFactor;
+        aiReturn ret = aiMat->Get(AI_MATKEY_SHININESS, specularFactor);
+        if (ret == aiReturn_SUCCESS)
+        {
+            material.specularFactor = specularFactor;
+        }
+
         aiString texPath;
-        aiReturn ret = aiMat->GetTexture(aiTexType, 0, &texPath);
+        ret = aiMat->GetTexture(aiTexType, 0, &texPath);
 
         if (ret != aiReturn_SUCCESS)
             continue;

@@ -29,6 +29,7 @@ uniform bool useOpacityTexture;
 uniform sampler2D bumpTexture;
 uniform int bumpType;
 
+uniform float shininess;
 uniform float masksOffset;
 uniform float alpha;
 uniform vec3 worldLightPos;
@@ -40,7 +41,6 @@ uniform vec3 cameraEye;
 const float ambientFactor = 0.25;
 const float specularFactor = 0.75;
 const float emissiveFactor = 0.75;
-const float shininess = 20.0;
 
 // taken from http://www.thetenthplanet.de/archives/1180
 mat3 cotangent_frame(vec3 N, vec3 p, vec2 uv)
@@ -125,7 +125,7 @@ void main()
 
     vec3 ambientTerm = ambientFactor * diffuseColor;
     vec3 diffuseTerm = diffuseColor * max(0.0, ndotl) * shadowFactor;
-    vec3 specularTerm = specularFactor * specularColor * pow(max(0.0, ndotH), shininess) * shadowFactor;
+    vec3 specularTerm = specularFactor * specularColor * pow(max(0.0, ndotH), 20.0) * shadowFactor;
     vec3 emissiveTerm = emissiveFactor * emissiveColor;
 
     outColor = ambientTerm + diffuseTerm + specularTerm + emissiveTerm;
@@ -133,5 +133,5 @@ void main()
 
     outNormal = v_normal;
     outWorldPos = v_worldCoord;
-    reflects = 0.0;
+    reflects = clamp(shininess / 100.0, 0.0, 1.0);
 }

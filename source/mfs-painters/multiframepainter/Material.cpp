@@ -1,5 +1,9 @@
 #include "Material.h"
 
+Material::Material()
+: specularFactor(0.0f)
+{}
+
 const Material::TextureMap& Material::textureMap() const
 {
     return m_textureMap;

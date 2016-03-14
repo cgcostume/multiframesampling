@@ -28,9 +28,9 @@ class Material
 public:
     using TextureMap = std::map<TextureType, globjects::ref_ptr<globjects::Texture>>;
 
-    Material() = default;
+    Material();
 
-    glm::vec3 specularColor;
+    float specularFactor;
 
     const TextureMap& textureMap() const;
     void addTexture(TextureType type, globjects::ref_ptr<globjects::Texture> texture);

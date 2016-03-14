@@ -226,12 +226,15 @@ void main()
     float strength;
     bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, pixelPerStep, maxSteps, maxDist, hitPixel, strength);
 
-    float reflectFactor = 1.0 - dot(normal, reflectDir);
-    bool reflects = bool(texture(reflectSampler, v_uv).r);
+    float reflectMaterialFactor = texture(reflectSampler, v_uv).r;
 
-    if (hit && reflects)
+    // fade out reflection torwards steep angles
+    float reflectAngleFactor = 1.0 - 1.5 * max(0.0, dot(normal, reflectDir));
+    reflectAngleFactor = clamp(reflectAngleFactor, 0.0, 1.0);
+
+    if (hit)
     {
-        float f = clamp(strength * 10.0, 0.0, 1.0);
-        outColor = mix(outColor, texture(colorSampler, hitPixel).rgb, f * reflectFactor);
+        float reflectDistanceFactor = clamp(strength * 3, 0.0, 1.0);
+        outColor = mix(outColor, texture(colorSampler, hitPixel).rgb, reflectDistanceFactor * reflectAngleFactor * reflectMaterialFactor);
     }
 }

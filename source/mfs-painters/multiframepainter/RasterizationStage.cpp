@@ -284,6 +284,8 @@ void RasterizationStage::render()
             tex->bindActive(BumpSampler);
         }
 
+        m_program->setUniform("shininess", material.specularFactor);
+
         m_program->setUniform("bumpType", static_cast<int>(bumpType));
         m_program->setUniform("useDiffuseTexture", hasDiffuseTex);
         m_program->setUniform("useSpecularTexture", hasSpecularTex);
