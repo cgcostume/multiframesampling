@@ -220,8 +220,8 @@ void main()
 
         vec3 viewReflectDir = normalize(normalMatrix * reflectDir);
 
-        float maxSteps = 30.0;
-        float pixelPerStep = 10.0;
+        float maxSteps = 40.0;
+        float pixelPerStep = 5.0;
         float maxDist = farZ / 40;
 
         vec2 hitPixel;
