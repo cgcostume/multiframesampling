@@ -4,8 +4,6 @@
 #include <glbinding/gl/functions.h>
 #include <glbinding/gl/boolean.h>
 
-#include <glm/gtc/random.hpp>
-
 #include <globjects/Framebuffer.h>
 #include <globjects/Texture.h>
 #include <globjects/Program.h>
@@ -89,10 +87,6 @@ void RasterizationStage::initialize()
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT2, worldPos.data());
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT3, reflectMask.data());
     m_fbo->attachTexture(GL_DEPTH_ATTACHMENT, depth.data());
-
-    camera.data()->setEye({ 1.0575, 0.7301, -1.59997 });
-    camera.data()->setCenter({ -0.618056, -0.782045, 1.98035 });
-    projection.data()->setZFar(50.0f);
 
     m_program = new globjects::Program();
     m_program->attach(
