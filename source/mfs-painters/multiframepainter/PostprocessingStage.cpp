@@ -48,6 +48,8 @@ namespace
         for (auto& elem : kernel)
         {
             elem.z = glm::abs(elem.z);
+            elem.z = std::max(0.1f, elem.z);
+            elem = glm::normalize(elem);
         }
 
         auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
