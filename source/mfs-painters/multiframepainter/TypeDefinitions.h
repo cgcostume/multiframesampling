@@ -33,6 +33,7 @@ struct PresetInformation
     float lightMaxShift;
     glm::vec3 groundColor;
     float groundHeight;
+    float alpha;
     BumpType bumpType;
     bool useReflections;
     float zThickness;

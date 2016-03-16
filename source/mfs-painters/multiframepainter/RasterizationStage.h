@@ -61,6 +61,7 @@ protected:
     void resizeTextures(int width, int height);
     static void setupGLState();
     void setupMasksTexture();
+    void setupKernel();
     void render();
 
     std::unique_ptr<OmnidirectionalShadowmap> m_shadowmap;

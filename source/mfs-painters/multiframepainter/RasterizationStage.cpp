@@ -34,10 +34,6 @@ using gloperate::make_unique;
 
 namespace
 {
-    const auto alpha = 1.0f;
-    const auto focalDist = 2.0f;
-    const auto focalPointRadius = 0.0f;
-
     enum Sampler
     {
         ShadowSampler,
@@ -63,6 +59,7 @@ RasterizationStage::RasterizationStage()
     addInput("materialMap", materialMap);
     addInput("useReflections", useReflections);
     addInput("useDOF", useDOF);
+    addInput("multiframeCount", multiFrameCount);
 
     addOutput("color", color);
     addOutput("normal", normal);
@@ -73,21 +70,7 @@ RasterizationStage::RasterizationStage()
 
 void RasterizationStage::initialize()
 {
-    m_aaSamples = {static_cast<uint16_t>(multiFrameCount.data())};
-    glkernel::sample::poisson_square(m_aaSamples);
-    glkernel::scale::range(m_aaSamples, -.5f, .5f);
-    glkernel::shuffle::random(m_aaSamples, 1);
-
-    m_dofSamples = {static_cast<uint16_t>(multiFrameCount.data())};
-    glkernel::sample::poisson_square(m_dofSamples);
-    glkernel::scale::range(m_dofSamples, -1.f, 1.f);
-    glkernel::sort::distance(m_dofSamples, {0.f, 0.f});
-
-    m_shadowSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
-    glkernel::sample::poisson_square(m_shadowSamples);
-    glkernel::scale::range(m_shadowSamples, -1.f, 1.f);
-    glkernel::sort::distance(m_shadowSamples, { 0.f, 0.f });
-
+    setupKernel();
     setupGLState();
     setupMasksTexture();
 
@@ -118,11 +101,34 @@ void RasterizationStage::initialize()
     );
 }
 
+void RasterizationStage::setupKernel()
+{
+    m_aaSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
+    glkernel::sample::poisson_square(m_aaSamples);
+    glkernel::scale::range(m_aaSamples, -.5f, .5f);
+    glkernel::shuffle::random(m_aaSamples, 1);
+
+    m_dofSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
+    glkernel::sample::poisson_square(m_dofSamples);
+    glkernel::scale::range(m_dofSamples, -1.f, 1.f);
+    glkernel::sort::distance(m_dofSamples, { 0.f, 0.f });
+
+    m_shadowSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
+    glkernel::sample::poisson_square(m_shadowSamples);
+    glkernel::scale::range(m_shadowSamples, -1.f, 1.f);
+    glkernel::sort::distance(m_shadowSamples, { 0.f, 0.f });
+}
+
 void RasterizationStage::process()
 {
     if (viewport.hasChanged())
     {
         resizeTextures(viewport.data()->width(), viewport.data()->height());
+    }
+
+    if (multiFrameCount.hasChanged())
+    {
+        setupKernel();
     }
 
     currentFrame.data() += 1;
@@ -174,7 +180,7 @@ void RasterizationStage::render()
 {
     for (auto program : std::vector<globjects::Program*>{ m_program, m_shadowmap->program() })
     {
-        program->setUniform("alpha", alpha);
+        program->setUniform("alpha", presetInformation.data().alpha);
     }
 
     auto lightPosition = presetInformation.data().lightPosition;
