@@ -45,6 +45,7 @@ public:
     gloperate::InputSlot<int> multiFrameCount;
     gloperate::InputSlot<PresetInformation> presetInformation;
     gloperate::InputSlot<bool> useReflections;
+    gloperate::InputSlot<bool> useDOF;
 
     gloperate::Data<int> currentFrame;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> color;

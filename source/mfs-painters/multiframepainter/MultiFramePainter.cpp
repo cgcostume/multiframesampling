@@ -52,7 +52,8 @@ MultiFramePainter::MultiFramePainter(ResourceManager & resourceManager, const cp
     m_projectionCapability->changed.connect([this]() { m_pipeline.projection.invalidate(); });
 
     addProperty(createProperty("Preset", m_pipeline.preset));
-    addProperty(createProperty("UseReflections", m_pipeline.useReflections));
+    addProperty(createProperty("Reflections", m_pipeline.useReflections));
+    addProperty(createProperty("DepthOfField", m_pipeline.useDOF));
 }
 
 MultiFramePainter::~MultiFramePainter()

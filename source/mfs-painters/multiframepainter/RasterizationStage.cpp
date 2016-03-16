@@ -62,10 +62,13 @@ RasterizationStage::RasterizationStage()
     addInput("presetInformation", presetInformation);
     addInput("materialMap", materialMap);
     addInput("useReflections", useReflections);
+    addInput("useDOF", useDOF);
 
     addOutput("color", color);
     addOutput("normal", normal);
     addOutput("depth", depth);
+    addOutput("worldPos", worldPos);
+    addOutput("reflectMask", reflectMask);
 }
 
 void RasterizationStage::initialize()
@@ -207,7 +210,8 @@ void RasterizationStage::render()
 
     auto subpixelSample = m_aaSamples[currentFrame.data() - 1];
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
-    auto focalPoint = m_dofSamples[currentFrame.data() - 1] * focalPointRadius;
+    auto focalPoint = m_dofSamples[currentFrame.data() - 1] * presetInformation.data().focalPoint;
+    focalPoint *= useDOF.data();
 
     for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
     {
@@ -233,7 +237,7 @@ void RasterizationStage::render()
         program->setUniform("masksOffset", static_cast<float>(currentFrame.data()) / TransparencyMasksGenerator::s_numMasks);
 
         program->setUniform("cocPoint", focalPoint);
-        program->setUniform("focalDist", focalDist);
+        program->setUniform("focalDist", presetInformation.data().focalDist);
     }
 
     m_shadowmap->distanceTexture()->bindActive(ShadowSampler);

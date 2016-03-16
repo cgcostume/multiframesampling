@@ -36,4 +36,6 @@ struct PresetInformation
     BumpType bumpType;
     bool useReflections;
     float zThickness;
+    float focalDist;
+    float focalPoint;
 };

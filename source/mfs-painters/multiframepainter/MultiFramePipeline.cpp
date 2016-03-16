@@ -28,6 +28,7 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->viewport = viewport;
     rasterizationStage->multiFrameCount = multiFrameCount;
     rasterizationStage->useReflections = useReflections;
+    rasterizationStage->useDOF = useDOF;
     rasterizationStage->drawablesMap = modelLoadingStage->drawablesMap;
     rasterizationStage->materialMap = modelLoadingStage->materialMap;
     rasterizationStage->presetInformation = modelLoadingStage->presetInformation;
