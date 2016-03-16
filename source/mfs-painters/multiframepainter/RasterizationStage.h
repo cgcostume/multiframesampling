@@ -44,6 +44,7 @@ public:
     gloperate::InputSlot<IdMaterialMap> materialMap;
     gloperate::InputSlot<int> multiFrameCount;
     gloperate::InputSlot<PresetInformation> presetInformation;
+    gloperate::InputSlot<bool> useReflections;
 
     gloperate::Data<int> currentFrame;
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> color;

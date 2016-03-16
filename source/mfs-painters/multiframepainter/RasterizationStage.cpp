@@ -61,6 +61,7 @@ RasterizationStage::RasterizationStage()
     addInput("drawablesMap", drawablesMap);
     addInput("presetInformation", presetInformation);
     addInput("materialMap", materialMap);
+    addInput("useReflections", useReflections);
 
     addOutput("color", color);
     addOutput("normal", normal);
@@ -196,7 +197,7 @@ void RasterizationStage::render()
 
     auto maxFloat = std::numeric_limits<float>::max();
 
-    m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(0.0f));
+    m_fbo->clearBuffer(GL_COLOR, 0, glm::vec4(presetInformation.data().groundColor, 1.0f));
     m_fbo->clearBuffer(GL_COLOR, 1, glm::vec4(0.0f));
     m_fbo->clearBuffer(GL_COLOR, 2, glm::vec4(maxFloat));
     m_fbo->clearBuffer(GL_COLOR, 3, glm::vec4(0.0f));

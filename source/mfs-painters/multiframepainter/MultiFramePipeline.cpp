@@ -12,6 +12,7 @@ MultiFramePipeline::MultiFramePipeline()
 , resourceManager(nullptr)
 , multiFrameCount(64)
 , preset(Preset::Jakobi)
+, useReflections(false)
 {
     auto modelLoadingStage = new ModelLoadingStage();
     auto rasterizationStage = new RasterizationStage();
@@ -26,6 +27,7 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->camera = camera;
     rasterizationStage->viewport = viewport;
     rasterizationStage->multiFrameCount = multiFrameCount;
+    rasterizationStage->useReflections = useReflections;
     rasterizationStage->drawablesMap = modelLoadingStage->drawablesMap;
     rasterizationStage->materialMap = modelLoadingStage->materialMap;
     rasterizationStage->presetInformation = modelLoadingStage->presetInformation;
@@ -33,6 +35,8 @@ MultiFramePipeline::MultiFramePipeline()
     postprocessingStage->viewport = viewport;
     postprocessingStage->camera = camera;
     postprocessingStage->projection = projection;
+    postprocessingStage->presetInformation = modelLoadingStage->presetInformation;
+    postprocessingStage->useReflections = useReflections;
     postprocessingStage->color = rasterizationStage->color;
     postprocessingStage->normal = rasterizationStage->normal;
     postprocessingStage->depth = rasterizationStage->depth;

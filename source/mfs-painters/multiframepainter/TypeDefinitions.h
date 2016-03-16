@@ -34,4 +34,6 @@ struct PresetInformation
     glm::vec3 groundColor;
     float groundHeight;
     BumpType bumpType;
+    bool useReflections;
+    float zThickness;
 };

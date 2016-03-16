@@ -5,6 +5,7 @@
 #include <gloperate/pipeline/AbstractStage.h>
 #include <gloperate/pipeline/InputSlot.h>
 
+#include "TypeDefinitions.h"
 
 namespace globjects
 {
@@ -31,6 +32,8 @@ public:
     gloperate::InputSlot<gloperate::AbstractPerspectiveProjectionCapability *> projection;
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
+    gloperate::InputSlot<PresetInformation> presetInformation;
+    gloperate::InputSlot<bool> useReflections;
 
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> normal;

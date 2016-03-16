@@ -20,6 +20,7 @@ public:
     gloperate::Data<gloperate::ResourceManager *> resourceManager;
     gloperate::Data<int> multiFrameCount;
     gloperate::Data<Preset> preset;
+    gloperate::Data<bool> useReflections;
 
     gloperate::Data<gloperate::AbstractViewportCapability *> viewport;
     gloperate::Data<gloperate::AbstractCameraCapability *> camera;
