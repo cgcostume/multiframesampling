@@ -139,6 +139,7 @@ void PostprocessingStage::process()
 
     m_screenAlignedQuad->program()->setUniform("useReflections", presetInformation.data().useReflections && useReflections.data());
     m_screenAlignedQuad->program()->setUniform("zThickness", presetInformation.data().zThickness);
+    m_screenAlignedQuad->program()->setUniform("ssaoRadius", presetInformation.data().lightMaxShift);
     m_screenAlignedQuad->program()->setUniform("projectionMatrix", projection.data()->projection());
     m_screenAlignedQuad->program()->setUniform("projectionInverseMatrix", projection.data()->projectionInverted());
     m_screenAlignedQuad->program()->setUniform("normalMatrix", camera.data()->normal());

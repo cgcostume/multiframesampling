@@ -22,8 +22,7 @@ uniform float farZ;
 uniform vec2 screenSize;
 uniform vec4 samplerSizes;
 uniform vec3 cameraEye;
-
-const float radius = 1.0;
+uniform float ssaoRadius;
 
 vec3 worldToCamera(vec3 pos)
 {
@@ -165,6 +164,8 @@ void main()
 {
     float d = linearDepth(v_uv);
     vec3 normal = normalize(texture(normalSampler, v_uv, 0).xyz);
+    vec3 worldPos = texture(worldPosSampler, v_uv).xyz;
+    vec3 viewPos = worldToCamera(worldPos);
 
     if (d > farZ)
         outColor = texture(colorSampler, v_uv).rgb;
@@ -176,10 +177,10 @@ void main()
 
     vec3 origin = eye.xyz * d;
 
-    vec3 screenspaceNormal = normalMatrix * normal;
+    vec3 viewNormal = normalMatrix * normal;
 
     // randomized orientation matrix for hemisphere based on face normal
-    mat3 m = noised(screenspaceNormal, v_uv);
+    mat3 m = noised(viewNormal, v_uv);
 
     float ao = 0.0;
 
@@ -187,7 +188,7 @@ void main()
     {
         vec3 s = m * texture(ssaoKernelSampler, i * samplerSizes[1]).xyz;
 
-        s *= 2.0 * radius;
+        s *= 2.0 * ssaoRadius;
         s += origin;
 
         vec4 s_offset = projectionMatrix * vec4(s, 1.0);
@@ -198,7 +199,7 @@ void main()
         float sd = -linearDepth(s_offset.xy);
 
         float ndcRangeCheck = 1.0 - float(any(greaterThan(s_offset.xyz, vec3(1.0))) || any(lessThan(s_offset.xyz, vec3(0.0))));
-        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(-origin.z + sd));
+        float rangeCheck = smoothstep(0.0, 1.0, ssaoRadius / abs(-origin.z + sd));
         ao += rangeCheck * ndcRangeCheck * float(sd > s.z);
     }
 
@@ -206,7 +207,8 @@ void main()
 
     outColor = texture(colorSampler, v_uv).rgb * ssao;
 
-    if  (useReflections){
+    if  (useReflections)
+    {
         vec3 worldViewDir = normalize(worldPos - cameraEye);
 
         vec3 random = texture(ssaoKernelSampler, 0).xyz;
@@ -216,8 +218,7 @@ void main()
         reflectionNormal = normalize(reflectionNormal);
         vec3 reflectDir = reflect(worldViewDir, reflectionNormal);
 
-        vec3 csPoint = worldToCamera(worldPos);
-        vec3 csDir = normalize(normalMatrix * reflectDir);
+        vec3 viewReflectDir = normalize(normalMatrix * reflectDir);
 
         float maxSteps = 30.0;
         float pixelPerStep = 10.0;
@@ -225,7 +226,7 @@ void main()
 
         vec2 hitPixel;
         float strength;
-        bool hit = traceScreenSpaceRay(csPoint, csDir, worldPosSampler, zThickness, pixelPerStep, maxSteps, maxDist, hitPixel, strength);
+        bool hit = traceScreenSpaceRay(viewPos, viewReflectDir, worldPosSampler, zThickness, pixelPerStep, maxSteps, maxDist, hitPixel, strength);
 
         float reflectMaterialFactor = texture(reflectSampler, v_uv).r;
 
