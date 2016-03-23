@@ -76,6 +76,12 @@ void KernelGenerationStage::process()
         glkernel::sample::poisson_square(shadowSamples);
         glkernel::scale::range(shadowSamples, -1.f, 1.f);
         glkernel::sort::distance(shadowSamples, { 0.f, 0.f });
+
+        auto& reflectionSamples = reflectionKernel.data();
+        reflectionSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
+        glkernel::sample::stratified(reflectionSamples);
+        glkernel::scale::range(reflectionSamples, -1.f, 1.f);
+        glkernel::sort::distance(reflectionSamples, { 0.f, 0.f, .0f });
     }
 
     auto& ssaoSamples = ssaoKernel.data();

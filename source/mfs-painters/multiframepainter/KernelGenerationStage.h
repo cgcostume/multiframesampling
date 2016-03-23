@@ -46,6 +46,4 @@ public:
 
     gloperate::Data<globjects::ref_ptr<globjects::Texture>> postprocessedFrame;
 
-protected:
-
 };

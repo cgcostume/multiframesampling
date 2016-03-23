@@ -45,6 +45,7 @@ MultiFramePipeline::MultiFramePipeline()
     postprocessingStage->projection = projection;
     postprocessingStage->presetInformation = modelLoadingStage->presetInformation;
     postprocessingStage->useReflections = useReflections;
+    postprocessingStage->currentFrame = rasterizationStage->currentFrame;
     postprocessingStage->reflectionKernel = kernelGenerationStage->reflectionKernel;
     postprocessingStage->ssaoKernel = kernelGenerationStage->ssaoKernel;
     postprocessingStage->ssaoNoise = kernelGenerationStage->ssaoNoise;

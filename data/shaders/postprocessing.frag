@@ -9,6 +9,7 @@ uniform sampler2D normalSampler;
 uniform sampler2D depthSampler;
 uniform sampler1D ssaoKernelSampler;
 uniform sampler2D ssaoNoiseSampler;
+uniform sampler1D reflectionKernelSampler;
 uniform sampler2D worldPosSampler;
 uniform sampler2D reflectSampler;
 
@@ -23,6 +24,7 @@ uniform vec2 screenSize;
 uniform vec4 samplerSizes;
 uniform vec3 cameraEye;
 uniform float ssaoRadius;
+uniform int currentFrame;
 
 const float maxTraceSteps = 40.0;
 const float pixelPerStep = 5.0;
@@ -206,8 +208,6 @@ void main()
 {
     float d = linearDepth(v_uv);
     vec3 normal = normalize(texture(normalSampler, v_uv, 0).xyz);
-    vec3 worldPos = texture(worldPosSampler, v_uv).xyz;
-    vec3 viewPos = worldToCamera(worldPos);
 
     if (d > farZ)
         outColor = texture(colorSampler, v_uv).rgb;
@@ -217,11 +217,12 @@ void main()
 
     if (useReflections)
     {
-        vec3 random = texture(ssaoKernelSampler, 0).xyz;
-        random.z *= -1.0 * float(texture(ssaoKernelSampler, 1).x > 0.0);
-        vec3 reflectionNormal = normal + random * 0.1;
+        vec3 reflectionOffset = texture(reflectionKernelSampler, 1.0 / currentFrame).rgb;
+        vec3 reflectionNormal = normal + reflectionOffset * 0.1;
         reflectionNormal = normalize(reflectionNormal);
 
+        vec3 worldPos = texture(worldPosSampler, v_uv).xyz;
+        vec3 viewPos = worldToCamera(worldPos);
         vec3 worldViewDir = normalize(worldPos - cameraEye);
         vec3 reflectDir = reflect(worldViewDir, reflectionNormal);
         vec3 viewReflectDir = normalize(normalMatrix * reflectDir);
@@ -239,7 +240,7 @@ void main()
             reflectAngleFactor = clamp(reflectAngleFactor, 0.0, 1.0);
 
             float reflectMaterialFactor = texture(reflectSampler, v_uv).r;
-            float reflectDistanceFactor = clamp(strength * 3, 0.0, 1.0);
+            float reflectDistanceFactor = clamp(strength * 6, 0.0, 1.0);
             outColor = mix(outColor, texture(colorSampler, hitPixel).rgb * ssao, reflectDistanceFactor * reflectAngleFactor * reflectMaterialFactor);
         }
     }

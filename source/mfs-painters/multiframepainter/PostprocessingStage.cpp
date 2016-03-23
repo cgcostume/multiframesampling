@@ -31,6 +31,7 @@ PostprocessingStage::PostprocessingStage()
     addInput("ssaoNoise", ssaoNoise);
     addInput("ssaoKernelSize", ssaoKernelSize);
     addInput("ssaoNoiseSize", ssaoNoiseSize);
+    addInput("currentFrame", currentFrame);
 
     addOutput("postprocessedFrame", postprocessedFrame);
 }
@@ -61,6 +62,11 @@ void PostprocessingStage::process()
         generateNoiseTexture();
     }
 
+    if (reflectionKernel.hasChanged())
+    {
+        generateReflectionKernelTexture();
+    }
+
     generateKernelTexture();
 
     m_fbo->bind();
@@ -73,6 +79,7 @@ void PostprocessingStage::process()
     m_ssaoNoiseTexture->bindActive(4);
     worldPos.data()->bindActive(5);
     reflectMask.data()->bindActive(6);
+    m_reflectionKernelTexture->bindActive(7);
 
     m_screenAlignedQuad->program()->setUniform("colorSampler", 0);
     m_screenAlignedQuad->program()->setUniform("normalSampler", 1);
@@ -81,6 +88,7 @@ void PostprocessingStage::process()
     m_screenAlignedQuad->program()->setUniform("ssaoNoiseSampler", 4);
     m_screenAlignedQuad->program()->setUniform("worldPosSampler", 5);
     m_screenAlignedQuad->program()->setUniform("reflectSampler", 6);
+    m_screenAlignedQuad->program()->setUniform("reflectionKernelSampler", 7);
 
     m_screenAlignedQuad->program()->setUniform("useReflections", presetInformation.data().useReflections && useReflections.data());
     m_screenAlignedQuad->program()->setUniform("zThickness", presetInformation.data().zThickness);
@@ -93,6 +101,7 @@ void PostprocessingStage::process()
     m_screenAlignedQuad->program()->setUniform("screenSize", screenSize);
     m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(ssaoKernelSize.data(), 1.f / ssaoKernelSize.data(), ssaoNoiseSize.data(), 1.f / ssaoNoiseSize.data()));
     m_screenAlignedQuad->program()->setUniform("cameraEye", camera.data()->eye());
+    m_screenAlignedQuad->program()->setUniform("currentFrame", currentFrame.data());
 
     m_screenAlignedQuad->draw();
 
@@ -133,4 +142,18 @@ void PostprocessingStage::generateKernelTexture()
     texture->image1D(0, gl::GL_RGBA32F, kernel.size(), 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
 
     m_ssaoKernelTexture = texture;
+}
+
+void PostprocessingStage::generateReflectionKernelTexture()
+{
+    auto kernel = reflectionKernel.data();
+
+    auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
+    texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
+
+    texture->image1D(0, gl::GL_RGBA32F, kernel.size(), 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
+
+    m_reflectionKernelTexture = texture;
 }

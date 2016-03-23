@@ -41,6 +41,7 @@ public:
     gloperate::InputSlot<std::vector<glm::vec3>> ssaoNoise;
     gloperate::InputSlot<int> ssaoKernelSize;
     gloperate::InputSlot<int> ssaoNoiseSize;
+    gloperate::InputSlot<int> currentFrame;
 
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> normal;
@@ -56,10 +57,12 @@ protected:
     void resizeTexture(int width, int height);
     void generateNoiseTexture();
     void generateKernelTexture();
+    void generateReflectionKernelTexture();
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<gloperate::ScreenAlignedQuad> m_screenAlignedQuad;
 
     globjects::ref_ptr<globjects::Texture> m_ssaoKernelTexture;
     globjects::ref_ptr<globjects::Texture> m_ssaoNoiseTexture;
+    globjects::ref_ptr<globjects::Texture> m_reflectionKernelTexture;
 };
