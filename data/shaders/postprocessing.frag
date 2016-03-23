@@ -26,7 +26,7 @@ uniform vec3 cameraEye;
 uniform float ssaoRadius;
 uniform int currentFrame;
 
-const float maxTraceSteps = 40.0;
+const float maxTraceSteps = 30.0;
 const float pixelPerStep = 5.0;
 
 vec3 worldToCamera(vec3 pos)
@@ -217,7 +217,8 @@ void main()
 
     if (useReflections)
     {
-        vec3 reflectionOffset = texture(reflectionKernelSampler, 1.0 / currentFrame).rgb;
+        int samples = textureSize(reflectionKernelSampler, 0);
+        vec3 reflectionOffset = texture(reflectionKernelSampler, currentFrame / float(samples)).rgb;
         vec3 reflectionNormal = normal + reflectionOffset * 0.1;
         reflectionNormal = normalize(reflectionNormal);
 

@@ -81,7 +81,8 @@ void KernelGenerationStage::process()
         reflectionSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
         glkernel::sample::stratified(reflectionSamples);
         glkernel::scale::range(reflectionSamples, -1.f, 1.f);
-        glkernel::sort::distance(reflectionSamples, { 0.f, 0.f, .0f });
+        glkernel::sort::distance(reflectionSamples, { 0.f, 0.f, 0.f });
+        reflectionSamples[0] = glm::vec3(0.0f);
     }
 
     auto& ssaoSamples = ssaoKernel.data();

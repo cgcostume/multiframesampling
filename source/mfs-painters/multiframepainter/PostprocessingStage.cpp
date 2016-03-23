@@ -101,7 +101,7 @@ void PostprocessingStage::process()
     m_screenAlignedQuad->program()->setUniform("screenSize", screenSize);
     m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(ssaoKernelSize.data(), 1.f / ssaoKernelSize.data(), ssaoNoiseSize.data(), 1.f / ssaoNoiseSize.data()));
     m_screenAlignedQuad->program()->setUniform("cameraEye", camera.data()->eye());
-    m_screenAlignedQuad->program()->setUniform("currentFrame", currentFrame.data());
+    m_screenAlignedQuad->program()->setUniform("currentFrame", currentFrame.data() - 1);
 
     m_screenAlignedQuad->draw();
 
