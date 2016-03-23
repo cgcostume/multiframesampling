@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glkernel/Kernel.h>
+
 #include <globjects/base/ref_ptr.h>
 
 #include <gloperate/pipeline/AbstractStage.h>
@@ -34,6 +36,11 @@ public:
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
     gloperate::InputSlot<PresetInformation> presetInformation;
     gloperate::InputSlot<bool> useReflections;
+    gloperate::InputSlot<glkernel::kernel3> reflectionKernel;
+    gloperate::InputSlot<glkernel::kernel3> ssaoKernel;
+    gloperate::InputSlot<std::vector<glm::vec3>> ssaoNoise;
+    gloperate::InputSlot<int> ssaoKernelSize;
+    gloperate::InputSlot<int> ssaoNoiseSize;
 
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> color;
     gloperate::InputSlot<globjects::ref_ptr<globjects::Texture>> normal;
@@ -47,6 +54,8 @@ protected:
     virtual void process() override;
 
     void resizeTexture(int width, int height);
+    void generateNoiseTexture();
+    void generateKernelTexture();
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<gloperate::ScreenAlignedQuad> m_screenAlignedQuad;

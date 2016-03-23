@@ -1,6 +1,7 @@
 #include "MultiFramePipeline.h"
 
 #include "ModelLoadingStage.h"
+#include "KernelGenerationStage.h"
 #include "RasterizationStage.h"
 #include "PostprocessingStage.h"
 #include "FrameAccumulationStage.h"
@@ -15,6 +16,7 @@ MultiFramePipeline::MultiFramePipeline()
 , useReflections(false)
 {
     auto modelLoadingStage = new ModelLoadingStage();
+    auto kernelGenerationStage = new KernelGenerationStage();
     auto rasterizationStage = new RasterizationStage();
     auto postprocessingStage = new PostprocessingStage();
     auto frameAccumulationStage = new FrameAccumulationStage();
@@ -22,6 +24,8 @@ MultiFramePipeline::MultiFramePipeline()
 
     modelLoadingStage->resourceManager = resourceManager;
     modelLoadingStage->preset = preset;
+
+    kernelGenerationStage->multiFrameCount = multiFrameCount;
 
     rasterizationStage->projection = projection;
     rasterizationStage->camera = camera;
@@ -32,12 +36,20 @@ MultiFramePipeline::MultiFramePipeline()
     rasterizationStage->drawablesMap = modelLoadingStage->drawablesMap;
     rasterizationStage->materialMap = modelLoadingStage->materialMap;
     rasterizationStage->presetInformation = modelLoadingStage->presetInformation;
+    rasterizationStage->antiAliasingKernel = kernelGenerationStage->antiAliasingKernel;
+    rasterizationStage->depthOfFieldKernel = kernelGenerationStage->depthOfFieldKernel;
+    rasterizationStage->shadowKernel = kernelGenerationStage->shadowKernel;
 
     postprocessingStage->viewport = viewport;
     postprocessingStage->camera = camera;
     postprocessingStage->projection = projection;
     postprocessingStage->presetInformation = modelLoadingStage->presetInformation;
     postprocessingStage->useReflections = useReflections;
+    postprocessingStage->reflectionKernel = kernelGenerationStage->reflectionKernel;
+    postprocessingStage->ssaoKernel = kernelGenerationStage->ssaoKernel;
+    postprocessingStage->ssaoNoise = kernelGenerationStage->ssaoNoise;
+    postprocessingStage->ssaoKernelSize = kernelGenerationStage->ssaoKernelSize;
+    postprocessingStage->ssaoNoiseSize = kernelGenerationStage->ssaoNoiseSize;
     postprocessingStage->color = rasterizationStage->color;
     postprocessingStage->normal = rasterizationStage->normal;
     postprocessingStage->depth = rasterizationStage->depth;
@@ -53,5 +65,5 @@ MultiFramePipeline::MultiFramePipeline()
     blitStage->accumulation = frameAccumulationStage->accumulation;
     blitStage->depth = rasterizationStage->depth;
 
-    addStages(modelLoadingStage, rasterizationStage, postprocessingStage, frameAccumulationStage, blitStage);
+    addStages(modelLoadingStage, kernelGenerationStage, rasterizationStage, postprocessingStage, frameAccumulationStage, blitStage);
 }

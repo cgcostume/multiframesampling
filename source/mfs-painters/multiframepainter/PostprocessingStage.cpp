@@ -3,10 +3,6 @@
 #include <glbinding/gl/enum.h>
 
 #include <glkernel/Kernel.h>
-#include <glkernel/sample.h>
-#include <glkernel/scale.h>
-
-#include <glm/gtc/random.hpp>
 
 #include <globjects/Texture.h>
 #include <globjects/Program.h>
@@ -19,67 +15,6 @@
 
 using namespace gl;
 
-
-namespace
-{
-    std::vector<glm::vec3> ssaoNoise(const unsigned int size)
-    {
-        auto kernel = std::vector<glm::vec3>();
-
-        for (auto y = 0u; y < size; ++y)
-        {
-            for (auto x = 0u; x < size; ++x)
-            {
-                auto c = glm::circularRand(1.f);
-                auto v = glm::vec3(c.x, c.y, 0.0f);
-
-                kernel.push_back(v);
-            }
-        }
-
-        return kernel;
-    }
-
-    globjects::Texture* ssaoKernelTexture(unsigned int size)
-    {
-        auto kernel = glkernel::kernel3{static_cast<uint16_t>(size)};
-        glkernel::sample::best_candidate(kernel);
-        glkernel::scale::range(kernel, -1.0f, 1.0f);
-        for (auto& elem : kernel)
-        {
-            elem.z = glm::abs(elem.z);
-            elem.z = std::max(0.1f, elem.z);
-            elem = glm::normalize(elem);
-        }
-
-        auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
-        texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
-        texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-        texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
-
-        texture->image1D(0, gl::GL_RGBA32F, size, 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
-
-        return texture;
-    }
-
-    globjects::Texture* ssaoNoiseTexture(unsigned int size)
-    {
-        auto texture = new globjects::Texture(gl::GL_TEXTURE_2D);
-        texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
-        texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-        texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
-        texture->setParameter(gl::GL_TEXTURE_WRAP_T, gl::GL_MIRRORED_REPEAT);
-
-        texture->image2D(0, gl::GL_RGBA32F, glm::ivec2(size), 0, gl::GL_RGB, gl::GL_FLOAT, ssaoNoise(size).data());
-
-        return texture;
-    }
-
-    const unsigned int kernelSize = 16;
-    const unsigned int noiseSize = 128;
-}
-
-
 PostprocessingStage::PostprocessingStage()
 {
     addInput("projection", projection);
@@ -91,6 +26,11 @@ PostprocessingStage::PostprocessingStage()
     addInput("reflectMask", reflectMask);
     addInput("presetInformation", presetInformation);
     addInput("useReflections", useReflections);
+    addInput("reflectionKernel", reflectionKernel);
+    addInput("ssaoKernel", ssaoKernel);
+    addInput("ssaoNoise", ssaoNoise);
+    addInput("ssaoKernelSize", ssaoKernelSize);
+    addInput("ssaoNoiseSize", ssaoNoiseSize);
 
     addOutput("postprocessedFrame", postprocessedFrame);
 }
@@ -101,8 +41,6 @@ void PostprocessingStage::initialize()
 
     m_fbo = new globjects::Framebuffer();
     m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, postprocessedFrame.data());
-
-    m_ssaoNoiseTexture = ssaoNoiseTexture(noiseSize);
 
     m_screenAlignedQuad = new gloperate::ScreenAlignedQuad(
         globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/postprocessing.frag")
@@ -118,7 +56,12 @@ void PostprocessingStage::process()
         resizeTexture(viewport.data()->width(), viewport.data()->height());
     }
 
-    m_ssaoKernelTexture = ssaoKernelTexture(kernelSize);
+    if (ssaoNoise.hasChanged())
+    {
+        generateNoiseTexture();
+    }
+
+    generateKernelTexture();
 
     m_fbo->bind();
     m_fbo->setDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -148,7 +91,7 @@ void PostprocessingStage::process()
     m_screenAlignedQuad->program()->setUniform("view", camera.data()->view());
     m_screenAlignedQuad->program()->setUniform("farZ", projection.data()->zFar());
     m_screenAlignedQuad->program()->setUniform("screenSize", screenSize);
-    m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(kernelSize, 1.f / kernelSize, noiseSize, 1.f / noiseSize));
+    m_screenAlignedQuad->program()->setUniform("samplerSizes", glm::vec4(ssaoKernelSize.data(), 1.f / ssaoKernelSize.data(), ssaoNoiseSize.data(), 1.f / ssaoNoiseSize.data()));
     m_screenAlignedQuad->program()->setUniform("cameraEye", camera.data()->eye());
 
     m_screenAlignedQuad->draw();
@@ -160,4 +103,34 @@ void PostprocessingStage::resizeTexture(int width, int height)
 {
     postprocessedFrame.data()->image2D(0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     m_fbo->printStatus(true);
+}
+
+void PostprocessingStage::generateNoiseTexture()
+{
+    auto& noise = ssaoNoise.data();
+    auto size = static_cast<int>(std::sqrt(noise.size()));
+
+    auto texture = new globjects::Texture(gl::GL_TEXTURE_2D);
+    texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_T, gl::GL_MIRRORED_REPEAT);
+
+    texture->image2D(0, gl::GL_RGBA32F, glm::ivec2(size), 0, gl::GL_RGB, gl::GL_FLOAT, noise.data());
+
+    m_ssaoNoiseTexture = texture;
+}
+
+void PostprocessingStage::generateKernelTexture()
+{
+    auto kernel = ssaoKernel.data();
+
+    auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
+    texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
+
+    texture->image1D(0, gl::GL_RGBA32F, kernel.size(), 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
+
+    m_ssaoKernelTexture = texture;
 }

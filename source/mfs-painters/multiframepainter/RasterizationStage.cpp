@@ -16,11 +16,6 @@
 
 #include <gloperate/primitives/PolygonalDrawable.h>
 
-#include <glkernel/sample.h>
-#include <glkernel/scale.h>
-#include <glkernel/sort.h>
-#include <glkernel/shuffle.h>
-
 #include "TransparencyMasksGenerator.h"
 #include "NoiseTexture.h"
 #include "OmnidirectionalShadowmap.h"
@@ -58,6 +53,9 @@ RasterizationStage::RasterizationStage()
     addInput("useReflections", useReflections);
     addInput("useDOF", useDOF);
     addInput("multiframeCount", multiFrameCount);
+    addInput("antiAliasingKernel", antiAliasingKernel);
+    addInput("depthOfFieldKernel", depthOfFieldKernel);
+    addInput("shadowKernel", shadowKernel);
 
     addOutput("color", color);
     addOutput("normal", normal);
@@ -68,7 +66,6 @@ RasterizationStage::RasterizationStage()
 
 void RasterizationStage::initialize()
 {
-    setupKernel();
     setupGLState();
     setupMasksTexture();
 
@@ -102,34 +99,11 @@ void RasterizationStage::initialize()
     );
 }
 
-void RasterizationStage::setupKernel()
-{
-    m_aaSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
-    glkernel::sample::poisson_square(m_aaSamples);
-    glkernel::scale::range(m_aaSamples, -.5f, .5f);
-    glkernel::shuffle::random(m_aaSamples, 1);
-
-    m_dofSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
-    glkernel::sample::poisson_square(m_dofSamples);
-    glkernel::scale::range(m_dofSamples, -1.f, 1.f);
-    glkernel::sort::distance(m_dofSamples, { 0.f, 0.f });
-
-    m_shadowSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
-    glkernel::sample::poisson_square(m_shadowSamples);
-    glkernel::scale::range(m_shadowSamples, -1.f, 1.f);
-    glkernel::sort::distance(m_shadowSamples, { 0.f, 0.f });
-}
-
 void RasterizationStage::process()
 {
     if (viewport.hasChanged())
     {
         resizeTextures(viewport.data()->width(), viewport.data()->height());
-    }
-
-    if (multiFrameCount.hasChanged())
-    {
-        setupKernel();
     }
 
     currentFrame.data() += 1;
@@ -187,7 +161,7 @@ void RasterizationStage::render()
     auto lightPosition = presetInformation.data().lightPosition;
     auto lightRadius = presetInformation.data().lightMaxShift;
 
-    auto frameLightOffset = m_shadowSamples[currentFrame.data() - 1] * lightRadius;
+    auto frameLightOffset = shadowKernel.data()[currentFrame.data() - 1] * lightRadius;
     auto frameLightPosition = lightPosition + glm::vec3(frameLightOffset.x, 0.0f, frameLightOffset.y);
 
     m_shadowmap->render(frameLightPosition, drawablesMap.data(), *m_groundPlane.get(), presetInformation.data().nearFar.x, presetInformation.data().nearFar.y);
@@ -217,9 +191,9 @@ void RasterizationStage::render()
 
     m_program->use();
 
-    auto subpixelSample = m_aaSamples[currentFrame.data() - 1];
+    auto subpixelSample = antiAliasingKernel.data()[currentFrame.data() - 1];
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
-    auto focalPoint = m_dofSamples[currentFrame.data() - 1] * presetInformation.data().focalPoint;
+    auto focalPoint = depthOfFieldKernel.data()[currentFrame.data() - 1] * presetInformation.data().focalPoint;
     focalPoint *= useDOF.data();
 
     for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })

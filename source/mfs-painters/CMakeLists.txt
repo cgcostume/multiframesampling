@@ -41,6 +41,7 @@ set(headers
     ${include_path}/multiframepainter/MultiFramePainter.h
     ${include_path}/multiframepainter/MultiFramePipeline.h
     ${include_path}/multiframepainter/ModelLoadingStage.h
+    ${include_path}/multiframepainter/KernelGenerationStage.h
     ${include_path}/multiframepainter/RasterizationStage.h
     ${include_path}/multiframepainter/PostprocessingStage.h
     ${include_path}/multiframepainter/FrameAccumulationStage.h
@@ -63,6 +64,7 @@ set(sources
     ${source_path}/multiframepainter/MultiFramePainter.cpp
     ${source_path}/multiframepainter/MultiFramePipeline.cpp
     ${source_path}/multiframepainter/ModelLoadingStage.cpp
+    ${source_path}/multiframepainter/KernelGenerationStage.cpp
     ${source_path}/multiframepainter/RasterizationStage.cpp
     ${source_path}/multiframepainter/PostprocessingStage.cpp
     ${source_path}/multiframepainter/FrameAccumulationStage.cpp

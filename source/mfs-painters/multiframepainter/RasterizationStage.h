@@ -40,6 +40,9 @@ public:
     gloperate::InputSlot<gloperate::AbstractPerspectiveProjectionCapability *> projection;
     gloperate::InputSlot<gloperate::AbstractViewportCapability *> viewport;
     gloperate::InputSlot<gloperate::AbstractCameraCapability *> camera;
+    gloperate::InputSlot<glkernel::kernel2> antiAliasingKernel;
+    gloperate::InputSlot<glkernel::kernel2> depthOfFieldKernel;
+    gloperate::InputSlot<glkernel::kernel2> shadowKernel;
     gloperate::InputSlot<IdDrawablesMap> drawablesMap;
     gloperate::InputSlot<IdMaterialMap> materialMap;
     gloperate::InputSlot<int> multiFrameCount;
@@ -61,7 +64,6 @@ protected:
     void resizeTextures(int width, int height);
     static void setupGLState();
     void setupMasksTexture();
-    void setupKernel();
     void render();
     void zPrepass();
 
@@ -74,8 +76,4 @@ protected:
 
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     std::unique_ptr<NoiseTexture> m_noiseTexture;
-
-    glkernel::kernel2 m_aaSamples;
-    glkernel::kernel2 m_dofSamples;
-    glkernel::kernel2 m_shadowSamples;
 };
