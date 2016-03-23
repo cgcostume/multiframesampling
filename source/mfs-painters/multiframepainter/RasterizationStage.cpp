@@ -93,6 +93,13 @@ void RasterizationStage::initialize()
         globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/model.vert"),
         globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/model.frag")
     );
+
+
+    m_zOnlyProgram = new globjects::Program();
+    m_zOnlyProgram->attach(
+        globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/model.vert"),
+        globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/empty.frag")
+    );
 }
 
 void RasterizationStage::setupKernel()
@@ -206,6 +213,8 @@ void RasterizationStage::render()
     m_fbo->clearBuffer(GL_COLOR, 3, glm::vec4(0.0f));
     m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0.0f);
 
+    zPrepass();
+
     m_program->use();
 
     auto subpixelSample = m_aaSamples[currentFrame.data() - 1];
@@ -308,6 +317,23 @@ void RasterizationStage::render()
     m_groundPlane->draw();
 
     m_fbo->unbind();
+}
+
+void RasterizationStage::zPrepass()
+{
+    m_zOnlyProgram->use();
+
+    for (auto& pair : drawablesMap.data())
+    {
+        auto& drawables = pair.second;
+
+        for (auto& drawable : drawables)
+        {
+            drawable->draw();
+        }
+    }
+
+    m_zOnlyProgram->release();
 }
 
 void RasterizationStage::setupGLState()

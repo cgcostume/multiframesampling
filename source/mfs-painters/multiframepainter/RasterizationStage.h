@@ -63,12 +63,14 @@ protected:
     void setupMasksTexture();
     void setupKernel();
     void render();
+    void zPrepass();
 
     std::unique_ptr<OmnidirectionalShadowmap> m_shadowmap;
     std::unique_ptr<GroundPlane> m_groundPlane;
 
     globjects::ref_ptr<globjects::Framebuffer> m_fbo;
     globjects::ref_ptr<globjects::Program> m_program;
+    globjects::ref_ptr<globjects::Program> m_zOnlyProgram;
 
     globjects::ref_ptr<globjects::Texture> m_masksTexture;
     std::unique_ptr<NoiseTexture> m_noiseTexture;
