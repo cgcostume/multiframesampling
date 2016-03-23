@@ -24,6 +24,9 @@ uniform vec4 samplerSizes;
 uniform vec3 cameraEye;
 uniform float ssaoRadius;
 
+const float maxTraceSteps = 40.0;
+const float pixelPerStep = 5.0;
+
 vec3 worldToCamera(vec3 pos)
 {
     vec4 pos4 = view * vec4(pos, 1.0);
@@ -89,6 +92,7 @@ bool traceScreenSpaceRay(vec3 csOrig, vec3 csDir, sampler2D csBuffer, float zThi
             continue;
         }
 
+        // hit was detected, try binary search to find exact reflection point
         if (depth < comp.z)
         {
             strength = 1.0 / i;
@@ -204,38 +208,32 @@ void main()
     }
 
     float ssao = 1.0 - (ao * samplerSizes[1]);
-
     outColor = texture(colorSampler, v_uv).rgb * ssao;
 
-    if  (useReflections)
+    if (useReflections)
     {
-        vec3 worldViewDir = normalize(worldPos - cameraEye);
-
         vec3 random = texture(ssaoKernelSampler, 0).xyz;
         random.z *= -1.0 * float(texture(ssaoKernelSampler, 1).x > 0.0);
-
         vec3 reflectionNormal = normal + random * 0.1;
         reflectionNormal = normalize(reflectionNormal);
-        vec3 reflectDir = reflect(worldViewDir, reflectionNormal);
 
+        vec3 worldViewDir = normalize(worldPos - cameraEye);
+        vec3 reflectDir = reflect(worldViewDir, reflectionNormal);
         vec3 viewReflectDir = normalize(normalMatrix * reflectDir);
 
-        float maxSteps = 40.0;
-        float pixelPerStep = 5.0;
         float maxDist = farZ / 40;
 
         vec2 hitPixel;
         float strength;
-        bool hit = traceScreenSpaceRay(viewPos, viewReflectDir, worldPosSampler, zThickness, pixelPerStep, maxSteps, maxDist, hitPixel, strength);
-
-        float reflectMaterialFactor = texture(reflectSampler, v_uv).r;
-
-        // fade out reflection torwards steep angles
-        float reflectAngleFactor = 1.0 - 1.5 * max(0.0, dot(normal, reflectDir));
-        reflectAngleFactor = clamp(reflectAngleFactor, 0.0, 1.0);
+        bool hit = traceScreenSpaceRay(viewPos, viewReflectDir, worldPosSampler, zThickness, pixelPerStep, maxTraceSteps, maxDist, hitPixel, strength);
 
         if (hit)
         {
+            // fade out reflection torwards steep angles
+            float reflectAngleFactor = 1.0 - 1.5 * max(0.0, dot(normal, reflectDir));
+            reflectAngleFactor = clamp(reflectAngleFactor, 0.0, 1.0);
+
+            float reflectMaterialFactor = texture(reflectSampler, v_uv).r;
             float reflectDistanceFactor = clamp(strength * 3, 0.0, 1.0);
             outColor = mix(outColor, texture(colorSampler, hitPixel).rgb * ssao, reflectDistanceFactor * reflectAngleFactor * reflectMaterialFactor);
         }
