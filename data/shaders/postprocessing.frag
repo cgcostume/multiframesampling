@@ -164,22 +164,14 @@ mat3 noised(const in vec3 normal, in vec2 uv)
     return mat3(t, b, normal);
 }
 
-void main()
+float ssao(float depth, vec3 normal)
 {
-    float d = linearDepth(v_uv);
-    vec3 normal = normalize(texture(normalSampler, v_uv, 0).xyz);
-    vec3 worldPos = texture(worldPosSampler, v_uv).xyz;
-    vec3 viewPos = worldToCamera(worldPos);
-
-    if (d > farZ)
-        outColor = texture(colorSampler, v_uv).rgb;
-
     vec4 eye = (projectionInverseMatrix * vec4(2.0*(v_uv - vec2(0.5)), 1.0, 1.0));
     eye.xyz /= eye.w;
     eye.xyz /= farZ;
     // eye has a z of -1 here
 
-    vec3 origin = eye.xyz * d;
+    vec3 origin = eye.xyz * depth;
 
     vec3 viewNormal = normalMatrix * normal;
 
@@ -207,7 +199,20 @@ void main()
         ao += rangeCheck * ndcRangeCheck * float(sd > s.z);
     }
 
-    float ssao = 1.0 - (ao * samplerSizes[1]);
+    return 1.0 - (ao * samplerSizes[1]);
+}
+
+void main()
+{
+    float d = linearDepth(v_uv);
+    vec3 normal = normalize(texture(normalSampler, v_uv, 0).xyz);
+    vec3 worldPos = texture(worldPosSampler, v_uv).xyz;
+    vec3 viewPos = worldToCamera(worldPos);
+
+    if (d > farZ)
+        outColor = texture(colorSampler, v_uv).rgb;
+
+    float ssao = ssao(d, normal);
     outColor = texture(colorSampler, v_uv).rgb * ssao;
 
     if (useReflections)

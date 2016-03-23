@@ -199,25 +199,20 @@ std::string ModelLoadingStage::getFilename(Preset preset)
 
 gloperate::Scene * ModelLoadingStage::convertScene(const aiScene * scene) const
 {
-    // Create new scene
     gloperate::Scene * sceneOut = new gloperate::Scene;
 
-    // Convert meshes from the scene
     for (size_t i = 0; i < scene->mNumMeshes; ++i)
     {
         sceneOut->meshes().push_back(convertGeometry(scene->mMeshes[i]));
     }
 
-    // Return scene
     return sceneOut;
 }
 
 gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh * mesh) const
 {
-    // Create geometry
     gloperate::PolygonalGeometry * geometry = new gloperate::PolygonalGeometry;
 
-    // Copy index array
     std::vector<unsigned int> indices;
     for (size_t i = 0; i < mesh->mNumFaces; ++i)
     {
@@ -227,7 +222,6 @@ gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh *
     }
     geometry->setIndices(std::move(indices));
 
-    // Copy vertex array
     std::vector<glm::vec3> vertices;
     for (size_t i = 0; i < mesh->mNumVertices; ++i)
     {
@@ -236,10 +230,8 @@ gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh *
     }
     geometry->setVertices(std::move(vertices));
 
-    // Does the mesh contain normal vectors?
     if (mesh->HasNormals())
     {
-        // Copy normal array
         std::vector<glm::vec3> normals;
         for (size_t i = 0; i < mesh->mNumVertices; ++i)
         {
@@ -249,10 +241,8 @@ gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh *
         geometry->setNormals(std::move(normals));
     }
 
-    // Does the mesh contain texture coordinates?
     if (mesh->HasTextureCoords(0))
     {
-        // Copy texture cooridinate array
         std::vector<glm::vec3> textureCoordinates;
         for (size_t i = 0; i < mesh->mNumVertices; ++i)
         {
@@ -262,9 +252,7 @@ gloperate::PolygonalGeometry * ModelLoadingStage::convertGeometry(const aiMesh *
         geometry->setTextureCoordinates(std::move(textureCoordinates));
     }
 
-    // Materials
     geometry->setMaterialIndex(mesh->mMaterialIndex);
 
-    // Return geometry
     return geometry;
 }
