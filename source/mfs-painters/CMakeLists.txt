@@ -38,6 +38,8 @@ set(include_path "${CMAKE_CURRENT_SOURCE_DIR}")
 set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(headers
+    ${include_path}/multiframepainter/mfs-painters-api.h
+
     ${include_path}/multiframepainter/MultiFramePainter.h
     ${include_path}/multiframepainter/MultiFramePipeline.h
     ${include_path}/multiframepainter/ModelLoadingStage.h

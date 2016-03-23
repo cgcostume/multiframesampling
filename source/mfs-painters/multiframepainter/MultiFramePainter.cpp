@@ -61,6 +61,16 @@ MultiFramePainter::~MultiFramePainter()
 {
 }
 
+int MultiFramePainter::multiframeCount() const
+{
+    return m_pipeline.getOutput<int>("currentFrame")->data();
+}
+
+float MultiFramePainter::framesPerSecond() const
+{
+    return m_fps;
+}
+
 void MultiFramePainter::onInitialize()
 {
     gloperate::registerNamedStrings("data/shaders", "glsl", true);
@@ -70,5 +80,12 @@ void MultiFramePainter::onInitialize()
 
 void MultiFramePainter::onPaint()
 {
+    using namespace std::chrono;
+
+    auto now = steady_clock::now();
+    auto duration = duration_cast<milliseconds>(now - m_lastTimepoint);
+    m_fps = 1000.0f / duration.count();
+    m_lastTimepoint = now;
+
     PipelinePainter::onPaint();
 }

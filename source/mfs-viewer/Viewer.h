@@ -3,23 +3,20 @@
 #include <memory>
 
 #include <QMainWindow>
+#include <QTimer>
+#include <QLabel>
 
-
-class Ui_Viewer;
 
 namespace widgetzeug
 {
     class MessageStatusWidget;
     class MessageWidget;
-    class ScriptPromptWidget;
 }
 
 namespace gloperate
 {
     class ResourceManager;
-    class PluginManager;
     class Painter;
-    class ImageExporter;
 }
 
 namespace gloperate_qt
@@ -27,8 +24,6 @@ namespace gloperate_qt
     class QtOpenGLWindow;
     class DefaultMapping;
     class ScriptEnvironment;
-    class ViewerApi;
-    class PluginApi;
 }
 
 
@@ -53,6 +48,9 @@ protected:
 
     void deinitializePainter();
 
+protected slots:
+    void onTimer();
+
 protected:
     std::unique_ptr<gloperate::ResourceManager>      m_resourceManager;
 
@@ -63,6 +61,10 @@ protected:
     std::unique_ptr<widgetzeug::MessageStatusWidget> m_messagesStatus;
     std::unique_ptr<widgetzeug::MessageWidget>       m_messagesLog;
 
+    QLabel                                           m_infoLabel;
+    QTimer                                           m_timer;
+
+    QDockWidget                                    * m_infoDockWidget;
     QDockWidget                                    * m_messagLogDockWidget;
     QDockWidget                                    * m_propertyDockWidget;
 };

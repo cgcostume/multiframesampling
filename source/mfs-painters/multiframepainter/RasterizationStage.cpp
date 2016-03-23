@@ -57,6 +57,7 @@ RasterizationStage::RasterizationStage()
     addInput("depthOfFieldKernel", depthOfFieldKernel);
     addInput("shadowKernel", shadowKernel);
 
+    addOutput("currentFrame", currentFrame);
     addOutput("color", color);
     addOutput("normal", normal);
     addOutput("depth", depth);

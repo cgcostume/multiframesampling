@@ -91,6 +91,7 @@ target_include_directories(${target}
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${GLM_INCLUDE_DIR}
+    ..
 )
 
 
@@ -115,6 +116,7 @@ target_link_libraries(${target}
     gloperate::gloperate
     gloperate::gloperate-qt
     gloperate::gloperate-assimp
+    ${META_PROJECT_NAME}::mfs-painters
 )
 
 

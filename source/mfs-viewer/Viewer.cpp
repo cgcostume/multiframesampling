@@ -2,6 +2,7 @@
 #include "Viewer.h"
 
 #include <cassert>
+#include <iomanip>
 
 #include <gloperate/ext-includes-begin.h>
 
@@ -26,6 +27,7 @@
 #include <gloperate-qt/viewer/QtWheelEventProvider.h>
 #include <gloperate-qt/viewer/DefaultMapping.h>
 
+#include <mfs-painters/multiframepainter/MultiFramePainter.h>
 
 using namespace widgetzeug;
 using namespace gloperate;
@@ -85,6 +87,9 @@ Viewer::Viewer(QWidget * parent, Qt::WindowFlags flags)
     // Restore GUI state from settings
     restoreGeometry(settings.value(SETTINGS_GEOMETRY).toByteArray());
     restoreState(settings.value(SETTINGS_STATE).toByteArray());
+
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    m_timer.start(20);
 }
 
 Viewer::~Viewer()
@@ -166,6 +171,10 @@ void Viewer::setupMessageWidgets()
     const QString fileLog(QString("Messages are also written to file://%1.").arg(MessageHandler::fileName()));
     qDebug("%s", qPrintable(fileLog));
 
+    m_infoDockWidget = new QDockWidget(tr("Info"));
+    m_infoDockWidget->setWidget(&m_infoLabel);
+    addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, m_infoDockWidget);
+
     // Create dock window for message log
     m_messagLogDockWidget = new QDockWidget(tr("Message Log"));
     m_messagLogDockWidget->setWidget(m_messagesLog.get());
@@ -224,6 +233,22 @@ void Viewer::setupCanvas()
 void Viewer::deinitializePainter()
 {
     m_painter.reset(nullptr);
+}
+
+void Viewer::onTimer()
+{
+    m_infoLabel.setText("");
+    auto mfPainter = dynamic_cast<MultiFramePainter*>(m_painter.get());
+    if (mfPainter)
+    {
+        std::stringstream ss;
+        ss << std::fixed << std::setprecision(2) << mfPainter->framesPerSecond();
+        
+        auto fpsStr = ss.str();
+        auto mfCountStr = std::to_string(mfPainter->multiframeCount());
+        auto str = "Frame: " + mfCountStr + ", FPS: " + fpsStr;
+        m_infoLabel.setText(QString::fromStdString(str));
+    }
 }
 
 gloperate::ResourceManager * Viewer::resourceManager()
