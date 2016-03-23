@@ -48,6 +48,8 @@ endif()
 
 set(sources
     main.cpp
+    Viewer.h
+    Viewer.cpp
     QtViewerMapping.cpp
     QtViewerMapping.h
 )
@@ -106,6 +108,8 @@ target_link_libraries(${target}
     Qt5::OpenGL
     libzeug::signalzeug
     libzeug::reflectionzeug
+    libzeug::widgetzeug
+    libzeug::propertyguizeug
     glbinding::glbinding
     globjects::globjects
     gloperate::gloperate

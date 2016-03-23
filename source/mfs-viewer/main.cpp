@@ -3,29 +3,17 @@
 
 #include <gloperate/ext-includes-begin.h>
 #include <QApplication>
-#include <QCoreApplication>
 #include <QDesktopWidget>
-#include <QString>
-#include <QMainWindow>
-#include <QOpenGLContext>
 #include <gloperate/ext-includes-end.h>
-
 
 #include <globjects/base/baselogging.h>
 
 #include <gloperate/plugin/PluginManager.h>
 #include <gloperate/plugin/PainterPlugin.h>
 #include <gloperate/resources/ResourceManager.h>
-
-#include <gloperate-qt/viewer/QtOpenGLWindow.h>
 #include <gloperate-qt/viewer/QtTextureLoader.h>
-#include <gloperate-qt/viewer/QtKeyEventProvider.h>
-#include <gloperate-qt/viewer/QtMouseEventProvider.h>
-#include <gloperate-qt/viewer/QtWheelEventProvider.h>
-#include <gloperate-qt/viewer/Viewer.h>
 
-#include "QtViewerMapping.h"
-
+#include "Viewer.h"
 
 using namespace gloperate;
 using namespace gloperate_qt;
@@ -78,42 +66,7 @@ int main(int argc, char * argv[])
 
     gloperate::Painter* painter = painterPlugin->createPainter(resourceManager);
 
-    // Create Event Provider
-    /*QtKeyEventProvider * keyProvider = new QtKeyEventProvider();
-    QtMouseEventProvider * mouseProvider = new QtMouseEventProvider();
-    QtWheelEventProvider * wheelProvider = new QtWheelEventProvider();
-
-    // Create OpenGL window
-    QSurfaceFormat format;
-    format.setVersion(3, 2);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setDepthBufferSize(16);
-
-    QtOpenGLWindow * window = new QtOpenGLWindow(resourceManager, format);
-    window->setPainter(painter.get());
-    window->installEventFilter(keyProvider);
-    window->installEventFilter(mouseProvider);
-    window->installEventFilter(wheelProvider);
-
-    // Create Mapping
-    QtViewerMapping * mapping = new QtViewerMapping(window);
-    mapping->setPainter(painter.get());
-    mapping->addProvider(keyProvider);
-    mapping->addProvider(mouseProvider);
-    mapping->addProvider(wheelProvider);
-
-
-    QRect rect = QApplication::desktop()->screenGeometry(); // used to center the mainwindow on desktop
-
-    // Create main window
-    QMainWindow mainWindow;
-    mainWindow.setGeometry((rect.width() - 1280) / 2, (rect.height() - 720) / 2, 1280, 720);
-    mainWindow.setCentralWidget(QWidget::createWindowContainer(window));
-    mainWindow.centralWidget()->setFocusPolicy(Qt::StrongFocus);
-
-    mainWindow.show();*/
-
-    gloperate_qt::Viewer viewer;
+    Viewer viewer;
     viewer.show();
     viewer.setPainter(*painter);
 
