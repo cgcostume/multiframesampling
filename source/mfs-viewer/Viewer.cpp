@@ -189,12 +189,10 @@ void Viewer::setupPropertyWidget()
 
 void Viewer::setupCanvas()
 {
-    // Setup OpenGL context format
     QSurfaceFormat format;
-    // Get OpenGL 3.2/4.1 core context
-    format.setVersion(4, 5);
+
+    format.setVersion(3, 2);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    // Get newest available compatibility context
     format.setDepthBufferSize(16);
 
     // Create OpenGL context and window
