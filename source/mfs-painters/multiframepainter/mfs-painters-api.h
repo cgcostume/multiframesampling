@@ -9,15 +9,23 @@
 #  ifndef MFS_PAINTERS_API
 #    ifdef mfs_painters_EXPORTS
 /* We are building this library */
-#      define MFS_PAINTERS_API __declspec(dllexport)
+#      ifdef _WIN32
+#        define MFS_PAINTERS_API __declspec(dllexport)
+#      else
+#        define MFS_PAINTERS_API __attribute__ ((visibility ("default")))
+#      endif
 #    else
 /* We are using this library */
-#      define MFS_PAINTERS_API __declspec(dllimport)
+#      ifdef _WIN32
+#        define MFS_PAINTERS_API __declspec(dllimport)
+#      else
+#        define MFS_PAINTERS_API
+#      endif
 #    endif
 #  endif
 
 #  ifndef MFS_PAINTERS_NO_EXPORT
-#    define MFS_PAINTERS_NO_EXPORT 
+#    define MFS_PAINTERS_NO_EXPORT
 #  endif
 #endif
 
