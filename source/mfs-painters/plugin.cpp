@@ -11,14 +11,14 @@ GLOPERATE_PLUGIN_LIBRARY
 
     GLOPERATE_PAINTER_PLUGIN(MultiFramePainter
     , "MultiFramePainter"
-    , "Moep"
+    , "Rendering using multi-frame sampling."
     , MULTIFRAMESAMPLING_AUTHOR_ORGANIZATION
-    , "v0.0.0" )
+    , "v1.0.0" )
 
     GLOPERATE_PAINTER_PLUGIN(SingleFramePainter
     , "SingleFramePainter"
-    , "Moep"
+    , "Rendering using single complete frames."
     , MULTIFRAMESAMPLING_AUTHOR_ORGANIZATION
-    , "v0.0.0" )
+    , "v1.0.0" )
 
 GLOPERATE_PLUGIN_LIBRARY_END

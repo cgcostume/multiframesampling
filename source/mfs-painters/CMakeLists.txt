@@ -138,8 +138,12 @@ target_include_directories(${target}
     ${ASSIMP_INCLUDE_DIR}
     
     PUBLIC
+    ${DEFAULT_INCLUDE_DIRECTORIES}
 
     INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
 )
 
 
@@ -210,7 +214,7 @@ target_link_libraries(${target}
 
 
 #
-# Deployment
+# Deployment (disabled)
 #
 
 # Library

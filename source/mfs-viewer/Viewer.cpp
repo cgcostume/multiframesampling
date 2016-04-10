@@ -27,7 +27,7 @@
 #include <gloperate-qt/viewer/QtWheelEventProvider.h>
 #include <gloperate-qt/viewer/DefaultMapping.h>
 
-#include <mfs-painters/multiframepainter/MultiFramePainter.h>
+#include <multiframepainter/MultiFramePainter.h>
 
 using namespace widgetzeug;
 using namespace gloperate;

@@ -26,6 +26,9 @@
 *.exe
 *.out
 *.app
-build/
+build*/
 
 _*.bat
+
+# local config
+.localconfig

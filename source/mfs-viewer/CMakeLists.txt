@@ -3,16 +3,16 @@
 # External dependencies
 # 
 
-find_package(GLM REQUIRED)
+find_package(GLM       REQUIRED)
 find_package(cpplocate REQUIRED)
 find_package(glbinding REQUIRED)
 find_package(globjects REQUIRED)
-find_package(libzeug REQUIRED)
+find_package(libzeug   REQUIRED)
 find_package(gloperate REQUIRED)
-find_package(Qt5Core    5.1)
-find_package(Qt5Gui     5.1)
-find_package(Qt5Widgets 5.1)
-find_package(Qt5OpenGL  5.1)
+find_package(Qt5Core    5.1 REQUIRED)
+find_package(Qt5Gui     5.1 REQUIRED)
+find_package(Qt5Widgets 5.1 REQUIRED)
+find_package(Qt5OpenGL  5.1 REQUIRED)
 
 # Enable automoc
 set(CMAKE_AUTOMOC ON)
@@ -21,9 +21,7 @@ set(AUTOMOC_MOC_OPTIONS PROPERTIES FOLDER CMakeAutomocTargets)
 set_property(GLOBAL PROPERTY AUTOMOC_FOLDER CMakeAutomocTargets)
 
 # ENABLE CMP0020: Automatically link Qt executables to qtmain target on Windows.
-if (POLICY CMP0020)
-    cmake_policy(SET CMP0020 NEW)
-endif()
+cmake_policy(SET CMP0020 NEW)
 
 
 # 
@@ -34,12 +32,7 @@ endif()
 set(target mfs-viewer)
 
 # Exit here if required dependencies are not met
-if (NOT Qt5Core_FOUND)
-    message(STATUS "Example ${target} skipped: Qt5 not found")
-    return()
-else()
-    message(STATUS "Example ${target}")
-endif()
+message(STATUS "Example ${target} skipped: Qt5 not found")
 
 
 # 
@@ -91,7 +84,7 @@ target_include_directories(${target}
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${GLM_INCLUDE_DIR}
-    ..
+    ${PROJECT_SOURCE_DIR}/source/mfs-painters
 )
 
 
