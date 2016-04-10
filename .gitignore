@@ -32,3 +32,6 @@ _*.bat
 
 # local config
 .localconfig
+
+# Qt project files
+CMakeLists.txt.user

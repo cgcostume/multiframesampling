@@ -38,24 +38,6 @@ namespace
     const QString SETTINGS_GEOMETRY("Geometry");
     const QString SETTINGS_STATE("State");
     const QString SETTINGS_PLUGINS("Plugins");
-
-    QStringList toQStringList(const std::vector<std::string> & list)
-    {
-        QStringList qlist;
-        for (auto s : list) {
-            qlist << QString::fromStdString(s);
-        }
-        return qlist;
-    }
-
-    std::vector<std::string> fromQStringList(const QStringList & qlist)
-    {
-        std::vector<std::string> list;
-        for (QString s : qlist) {
-            list.push_back(s.toStdString());
-        }
-        return list;
-    }
 }
 
 Viewer::Viewer(QWidget * parent, Qt::WindowFlags flags)

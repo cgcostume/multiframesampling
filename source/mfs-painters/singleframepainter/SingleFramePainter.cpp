@@ -232,11 +232,11 @@ void SingleFramePainter::createAndSetupTexture()
 
 void SingleFramePainter::createAndSetupGeometry()
 {
-    static const std::array<glm::vec2, 4> raw {
+    static const auto raw = std::array<glm::vec2, 4>{{
         glm::vec2( +1.f, -1.f ),
         glm::vec2( +1.f, +1.f ),
         glm::vec2( -1.f, -1.f ),
-        glm::vec2( -1.f, +1.f ) };
+        glm::vec2( -1.f, +1.f ) }};
 
     m_vao = new VertexArray;
     m_buffer = new Buffer();

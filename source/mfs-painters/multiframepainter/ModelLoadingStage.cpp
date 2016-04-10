@@ -88,7 +88,11 @@ void ModelLoadingStage::process()
         aiProcess_RemoveRedundantMaterials);
 
     if (!assimpScene)
-        std::cout << aiGetErrorString();
+    {
+        std::cout << "Model could not be loaded: " << aiGetErrorString() << std::endl;
+
+        return ;
+    }
 
     for (unsigned int m = 0; m < assimpScene->mNumMaterials; m++)
     {
