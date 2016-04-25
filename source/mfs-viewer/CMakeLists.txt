@@ -43,8 +43,6 @@ set(sources
     main.cpp
     Viewer.h
     Viewer.cpp
-    QtViewerMapping.cpp
-    QtViewerMapping.h
 )
 
 
