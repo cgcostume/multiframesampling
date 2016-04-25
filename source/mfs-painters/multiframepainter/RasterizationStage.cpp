@@ -92,7 +92,6 @@ void RasterizationStage::initialize()
         globjects::Shader::fromFile(GL_FRAGMENT_SHADER, "data/shaders/model.frag")
     );
 
-
     m_zOnlyProgram = new globjects::Program();
     m_zOnlyProgram->attach(
         globjects::Shader::fromFile(GL_VERTEX_SHADER, "data/shaders/model.vert"),
@@ -188,16 +187,12 @@ void RasterizationStage::render()
     m_fbo->clearBuffer(GL_COLOR, 3, glm::vec4(0.0f));
     m_fbo->clearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0.0f);
 
-    zPrepass();
-
-    m_program->use();
-
     auto subpixelSample = antiAliasingKernel.data()[currentFrame.data() - 1];
     auto viewportSize = glm::vec2(viewport.data()->width(), viewport.data()->height());
     auto focalPoint = depthOfFieldKernel.data()[currentFrame.data() - 1] * presetInformation.data().focalPoint;
     focalPoint *= useDOF.data();
 
-    for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program() })
+    for (auto program : std::vector<globjects::Program*>{ m_program, m_groundPlane->program(), m_zOnlyProgram })
     {
         program->setUniform("shadowmap", ShadowSampler);
         program->setUniform("masksTexture", MaskSampler);
@@ -224,10 +219,16 @@ void RasterizationStage::render()
         program->setUniform("focalDist", presetInformation.data().focalDist);
     }
 
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    zPrepass();
+
     m_shadowmap->distanceTexture()->bindActive(ShadowSampler);
     m_masksTexture->bindActive(MaskSampler);
     m_noiseTexture->bindActive(NoiseSampler);
 
+    m_program->use();
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     for (auto& pair : drawablesMap.data())
     {
         auto materialId = pair.first;
@@ -300,7 +301,14 @@ void RasterizationStage::zPrepass()
 
     for (auto& pair : drawablesMap.data())
     {
+        auto materialId = pair.first;
         auto& drawables = pair.second;
+
+        auto& material = materialMap.data().at(materialId);
+        if (material.hasTexture(TextureType::Opacity))
+        {
+            continue;
+        }
 
         for (auto& drawable : drawables)
         {
@@ -314,7 +322,7 @@ void RasterizationStage::zPrepass()
 void RasterizationStage::setupGLState()
 {
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
