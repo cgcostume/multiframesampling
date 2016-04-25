@@ -63,7 +63,8 @@ void KernelGenerationStage::process()
         aaSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
         glkernel::sample::poisson_square(aaSamples);
         glkernel::scale::range(aaSamples, -.5f, .5f);
-        glkernel::shuffle::random(aaSamples, 1);
+        if (aaSamples.size() > 1)
+            glkernel::shuffle::random(aaSamples, 1);
 
         auto& dofSamples = depthOfFieldKernel.data();
         dofSamples = { static_cast<uint16_t>(multiFrameCount.data()) };
