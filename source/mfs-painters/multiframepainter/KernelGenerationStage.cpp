@@ -89,11 +89,16 @@ void KernelGenerationStage::process()
     ssaoSamples = glkernel::kernel3{ static_cast<uint16_t>(s_ssaoKernelSize) };
     glkernel::sample::best_candidate(ssaoSamples);
     glkernel::scale::range(ssaoSamples, -1.0f, 1.0f);
-    for (auto& elem : ssaoSamples)
+    for (int i = 0; i < ssaoSamples.size(); i++)
     {
+        auto& elem = ssaoSamples[i];
         elem.z = glm::abs(elem.z);
         elem.z = std::max(0.1f, elem.z);
         elem = glm::normalize(elem);
+        // taken from http://john-chapman-graphics.blogspot.de/2013/01/ssao-tutorial.html
+        float scale = float(i) / float(ssaoSamples.size());
+        scale = glm::mix(0.1f, 1.0f, scale * scale);
+        ssaoSamples[i] *= scale;
     }
 
     if (multiFrameCount.hasChanged())

@@ -122,8 +122,8 @@ void PostprocessingStage::generateNoiseTexture()
     auto texture = new globjects::Texture(gl::GL_TEXTURE_2D);
     texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
     texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
-    texture->setParameter(gl::GL_TEXTURE_WRAP_T, gl::GL_MIRRORED_REPEAT);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_REPEAT);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_T, gl::GL_REPEAT);
 
     texture->image2D(0, gl::GL_RGBA32F, glm::ivec2(size), 0, gl::GL_RGB, gl::GL_FLOAT, noise.data());
 
@@ -137,7 +137,7 @@ void PostprocessingStage::generateKernelTexture()
     auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
     texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
     texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_REPEAT);
 
     texture->image1D(0, gl::GL_RGBA32F, kernel.size(), 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
 
@@ -151,7 +151,7 @@ void PostprocessingStage::generateReflectionKernelTexture()
     auto texture = new globjects::Texture(gl::GL_TEXTURE_1D);
     texture->setParameter(gl::GL_TEXTURE_MIN_FILTER, gl::GL_NEAREST);
     texture->setParameter(gl::GL_TEXTURE_MAG_FILTER, gl::GL_NEAREST);
-    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_MIRRORED_REPEAT);
+    texture->setParameter(gl::GL_TEXTURE_WRAP_S, gl::GL_REPEAT);
 
     texture->image1D(0, gl::GL_RGBA32F, kernel.size(), 0, gl::GL_RGB, gl::GL_FLOAT, kernel.data());
 
