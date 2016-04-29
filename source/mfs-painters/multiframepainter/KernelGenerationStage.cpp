@@ -97,7 +97,7 @@ void KernelGenerationStage::process()
         elem = glm::normalize(elem);
         // taken from http://john-chapman-graphics.blogspot.de/2013/01/ssao-tutorial.html
         float scale = float(i) / float(ssaoSamples.size());
-        scale = scale * scale;
+        scale = glm::mix(0.1f, 1.0f, scale * scale);
         elem *= scale;
         elem.z = std::max(0.1f, elem.z);
     }
